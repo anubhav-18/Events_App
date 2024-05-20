@@ -1,6 +1,6 @@
 # cu_events
 
-A new Flutter project.
+CU EVENTS DETAILS
 
 ## Getting Started
 
