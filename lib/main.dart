@@ -1,25 +1,55 @@
+import 'dart:io';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cu_events/admin_login_screen.dart';
 import 'package:cu_events/admin_panel.dart';
-import 'package:cu_events/checkConnectivity.dart';
 import 'package:cu_events/constants.dart';
 import 'package:cu_events/events_details.dart';
 import 'package:cu_events/events_page.dart';
 import 'package:cu_events/firebase_options.dart';
 import 'package:cu_events/homepage.dart';
+import 'package:cu_events/notification.dart';
 import 'package:cu_events/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await NotificationService.initialize();
+
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  if (!isAllowed) {
+    await AwesomeNotifications().requestPermissionToSendNotifications();
+  }
+
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: (receivedAction) async {
+      if (receivedAction.buttonKeyPressed == 'OPEN_IMAGE') {
+        String? imagePath = receivedAction.payload?['imagePath'];
+        if (imagePath != null) {
+          await _openImage(imagePath);
+        }
+      }
+    },
+  );
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
     runApp(MyApp());
   });
+}
+
+Future<void> _openImage(String imagePath) async {
+  final Uri url = Uri.parse(imagePath);
+  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $url';
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -32,6 +62,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'JockeyOne',
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          },
+        ),
         brightness: Brightness.light,
         useMaterial3: true,
         scaffoldBackgroundColor: primaryBckgnd,
@@ -56,6 +91,7 @@ class MyApp extends StatelessWidget {
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: barBckgnd,
+          iconTheme: IconThemeData(color: textColor),
           titleTextStyle: TextStyle(
             fontSize: 34,
             color: headingColor,

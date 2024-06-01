@@ -53,6 +53,8 @@ dependencies:
   dio: ^5.4.3+1
   image_gallery_saver: ^2.0.3
   path: ^1.9.0
+  open_file: ^3.3.2
+  awesome_notifications: ^0.9.3+1
 
 dev_dependencies:
   flutter_test:

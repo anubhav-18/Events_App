@@ -1,4 +1,5 @@
 import 'package:cu_events/cachedImage.dart';
+import 'package:cu_events/notification.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/models/event.dart';
@@ -15,10 +16,10 @@ class EventDetailsPage extends StatelessWidget {
 
     Future<void> _downloadImage(BuildContext context, String imageUrl) async {
       final Uri uri = Uri.parse(imageUrl);
-      final String fileName = uri.pathSegments.last;
+      final String imageName = uri.pathSegments.last.split('/').last;
 
       final tempDir = await getTemporaryDirectory();
-      final path = '${tempDir.path}/$fileName';
+      final path = '${tempDir.path}/$imageName';
       await Dio().download(imageUrl, path);
 
       if (imageUrl.contains('.jpg') || imageUrl.contains('.jpeg') || imageUrl.contains('.png')) {
@@ -26,8 +27,15 @@ class EventDetailsPage extends StatelessWidget {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Downloading Image...')),
+        SnackBar(content: Text('Downloading $imageName..')),
       );
+
+      await NotificationService.showNotification(
+        title: imageName,
+        body: 'Download Complete',
+        payload: imageUrl,
+      );
+
     }
 
     return Scaffold(
