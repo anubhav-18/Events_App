@@ -1,15 +1,15 @@
 import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:cu_events/admin_login_screen.dart';
-import 'package:cu_events/admin_panel.dart';
+import 'package:cu_events/view/admin/admin_login_screen.dart';
+import 'package:cu_events/view/admin/admin_panel.dart';
 import 'package:cu_events/constants.dart';
-import 'package:cu_events/events_details.dart';
-import 'package:cu_events/events_page.dart';
+import 'package:cu_events/view/events/events_details.dart';
+import 'package:cu_events/view/events/events_page.dart';
 import 'package:cu_events/firebase_options.dart';
-import 'package:cu_events/homepage.dart';
-import 'package:cu_events/notification.dart';
-import 'package:cu_events/splashscreen.dart';
+import 'package:cu_events/view/home/homepage.dart';
+import 'package:cu_events/controller/notification.dart';
+import 'package:cu_events/view/splashscreen/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

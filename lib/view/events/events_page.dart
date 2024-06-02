@@ -1,4 +1,4 @@
-import 'package:cu_events/cachedImage.dart';
+import 'package:cu_events/reusable_widget/cachedImage.dart';
 import 'package:cu_events/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/firestore_service.dart';

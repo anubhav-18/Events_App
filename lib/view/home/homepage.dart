@@ -1,7 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cu_events/cachedImage.dart';
+import 'package:cu_events/reusable_widget/cachedImage.dart';
 import 'package:cu_events/constants.dart';
 import 'package:cu_events/firestore_service.dart';
 import 'package:cu_events/models/event.dart';
@@ -123,7 +123,9 @@ class _HomepageState extends State<Homepage> {
                               child: Text(
                                 'There are no popular events',
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                 ),

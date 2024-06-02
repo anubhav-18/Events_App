@@ -1,5 +1,5 @@
-import 'package:cu_events/cachedImage.dart';
-import 'package:cu_events/notification.dart';
+import 'package:cu_events/reusable_widget/cachedImage.dart';
+import 'package:cu_events/controller/notification.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/models/event.dart';
