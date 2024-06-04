@@ -22,7 +22,7 @@ class CachedImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: imageUrl,
       placeholder: (context, url) => const SpinKitChasingDots(
-        color: headingColor,
+        color: textColor,
       ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
       alignment: Alignment.center,

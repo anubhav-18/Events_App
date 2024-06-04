@@ -72,7 +72,7 @@ class EventsPage extends StatelessWidget {
                     margin: EdgeInsets.zero,
                     elevation: 0,
                     child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.only(bottom: 10),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -80,9 +80,9 @@ class EventsPage extends StatelessWidget {
                             child: Center(
                               child: CachedImage(
                                 imageUrl: event.imageUrl,
-                                height: height * 0.2,
-                                width: width * 0.45,
-                                boxFit: BoxFit.contain,
+                                height: height * 0.31,
+                                width: width * 0.5,
+                                boxFit: BoxFit.fill,
                               ),
                             ),
                           ),
@@ -101,35 +101,32 @@ class EventsPage extends StatelessWidget {
                                       .textTheme
                                       .headlineMedium,
                                 ),
-                                const SizedBox(height: 5),
                                 Text(
                                   event.description,
                                   overflow: TextOverflow.ellipsis,
-                                  maxLines: 6,
-                                  style:
-                                      Theme.of(context).textTheme.bodySmall,
+                                  maxLines: 4,
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
-                                const SizedBox(height: 5),
                                 InkWell(
                                   onTap: () async {
                                     final Uri url = Uri.parse(event.link);
-                                    if (!await launchUrl(url,
-                                        mode: LaunchMode
-                                            .externalApplication)) {
+                                    if (!await launchUrl(
+                                      url,
+                                      mode: LaunchMode.externalApplication,
+                                    )) {
                                       throw 'Could not launch $url';
                                     }
                                   },
                                   child: Text(
                                     event.link,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 3,
+                                    overflow: TextOverflow.fade,
+                                    maxLines: 2,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
                                         ?.copyWith(color: Colors.blue),
                                   ),
                                 ),
-                                const SizedBox(height: 5),
                                 Text(
                                   'Deadline: ${event.deadline.toString().split(' ')[0]}',
                                   style: Theme.of(context)
@@ -146,25 +143,6 @@ class EventsPage extends StatelessWidget {
                   ),
                 ),
               );
-
-              // ListTile(
-              //   contentPadding: const EdgeInsets.all(8.0),
-              //   leading: SizedBox(
-              //     width: MediaQuery.of(context).size.width * 0.4,
-              //     child: Image.network(
-              //       event.imageUrl,
-              //       fit: BoxFit.cover,
-              //       errorBuilder: (context, error, stackTrace) {
-              //         return const Icon(Icons.error);
-              //       },
-              //     ),
-              //   ),
-              //   title: Text(event.title),
-              //   onTap: () {
-              //     Navigator.pushNamed(context, '/event_details',
-              //         arguments: event);
-              //   },
-              // );
             },
           );
         },

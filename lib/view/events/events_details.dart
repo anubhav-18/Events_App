@@ -87,7 +87,6 @@ class EventDetailsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              // Image.network(event.imageUrl),
               const SizedBox(height: 16),
               Text(
                 'Description',
