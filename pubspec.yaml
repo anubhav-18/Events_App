@@ -56,6 +56,9 @@ dependencies:
   open_file: ^3.3.2
   awesome_notifications: ^0.9.3+1
   smooth_page_indicator: ^1.1.0
+  marquee_widget: ^1.2.0
+  share_plus: ^9.0.0
+  add_2_calendar: ^3.0.1
 
 dev_dependencies:
   flutter_test:

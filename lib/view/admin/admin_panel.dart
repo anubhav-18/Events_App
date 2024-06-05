@@ -2,6 +2,8 @@ import 'package:cu_events/view/admin/admin_Panel/add_events.dart';
 import 'package:cu_events/view/admin/admin_Panel/delete_events.dart';
 import 'package:cu_events/view/admin/admin_Panel/update_events/update_events_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
 
 class AdminPanel extends StatefulWidget {
   const AdminPanel({Key? key}) : super(key: key);
@@ -13,6 +15,8 @@ class AdminPanel extends StatefulWidget {
 class _AdminPanelState extends State<AdminPanel>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  // ignore: unused_field
+  late User _currentUser;
 
   @override
   void initState() {
@@ -24,6 +28,41 @@ class _AdminPanelState extends State<AdminPanel>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkCurrentUser();
+  }
+
+  Future<void> _checkCurrentUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, '/secret-admin-login');
+      });
+    } else {
+      const allowedEmail = 'cu.events.18@gmail.com';
+      if (user.email == allowedEmail) {
+        setState(() {
+          _currentUser = user;
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacementNamed(context, '/home');
+        });
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "You are not ADMIN.",
+              ),
+            ),
+          );
+        });
+      }
+    }
   }
 
   @override

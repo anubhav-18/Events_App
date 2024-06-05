@@ -1,133 +1,325 @@
-import 'package:flutter/material.dart';
 import 'package:cu_events/constants.dart';
+import 'package:flutter/material.dart';
 
-class Category {
-  final String name;
-  final List<Subcategory> subcategories;
-
-  Category({required this.name, required this.subcategories});
-}
-
-class Subcategory {
-  final String name;
-  final String route;
-
-  Subcategory({required this.name, required this.route});
-}
-
-final List<Category> categories = [
-  Category(
-    name: 'Engineering',
-    subcategories: [
-      Subcategory(name: 'Academic Events', route: '/engineering/academic'),
-      Subcategory(name: 'Cultural Events', route: '/engineering/cultural'),
-      Subcategory(name: 'NSS/NCC', route: '/engineering/nss_ncc'),
-      Subcategory(name: 'Others', route: '/engineering/others'),
-    ],
-  ),
-  Category(
-    name: 'Medical',
-    subcategories: [
-      Subcategory(name: 'Academic Events', route: '/medical/academic'),
-      Subcategory(name: 'Cultural Events', route: '/medical/cultural'),
-      Subcategory(name: 'NSS/NCC', route: '/medical/nss_ncc'),
-      Subcategory(name: 'Others', route: '/medical/others'),
-    ],
-  ),
-  Category(
-    name: 'Business',
-    subcategories: [
-      Subcategory(name: 'Academic Events', route: '/business/academic'),
-      Subcategory(name: 'Cultural Events', route: '/business/cultural'),
-      Subcategory(name: 'NSS/NCC', route: '/business/nss_ncc'),
-      Subcategory(name: 'Others', route: '/business/others'),
-    ],
-  ),
-  Category(
-    name: 'Law',
-    subcategories: [
-      Subcategory(name: 'Academic Events', route: '/law/academic'),
-      Subcategory(name: 'Cultural Events', route: '/law/cultural'),
-      Subcategory(name: 'NSS/NCC', route: '/law/nss_ncc'),
-      Subcategory(name: 'Others', route: '/law/others'),
-    ],
-  ),
-  Category(
-    name: 'Others',
-    subcategories: [
-      Subcategory(name: 'Academic Events', route: '/other/academic'),
-      Subcategory(name: 'Cultural Events', route: '/other/cultural'),
-      Subcategory(name: 'NSS/NCC', route: '/other/nss_ncc'),
-      Subcategory(name: 'Others', route: '/other/others'),
-    ],
-  ),
-];
-
-class CategoryExpansionTile extends StatefulWidget {
-  const CategoryExpansionTile({super.key});
+//Create Statefull Class named ExpansionTileRadio
+class ExpansionTileRadio extends StatefulWidget {
+  const ExpansionTileRadio({Key? key}) : super(key: key);
 
   @override
-  _CategoryExpansionTileState createState() => _CategoryExpansionTileState();
+  State<ExpansionTileRadio> createState() => _ExpansionTileRadioState();
 }
 
-class _CategoryExpansionTileState extends State<CategoryExpansionTile> {
-  late final List<Item> _items = generateItems(categories);
+class _ExpansionTileRadioState extends State<ExpansionTileRadio> {
+  UniqueKey item1Key = UniqueKey();
+  UniqueKey item2Key = UniqueKey();
+  UniqueKey item3Key = UniqueKey();
+  UniqueKey item4Key = UniqueKey();
+  UniqueKey item5Key = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: ExpansionPanelList.radio(
-        elevation: 0,
-        children: _items.map<ExpansionPanelRadio>((Item item) {
-          return ExpansionPanelRadio(
-            value: item.id,
-            headerBuilder: (BuildContext context, bool isExpanded) {
-              return ListTile(
-                title: Text(
-                  item.category.name,
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: isExpanded ? primaryBckgnd : textColor,
-                      ),
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          children: [
+            // First
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  width: 2,
+                  color: primaryBckgnd,
                 ),
-              );
-            },
-            body: Column(
-              children: item.category.subcategories.map((subcategory) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, subcategory.route);
+              ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  textColor: primaryBckgnd,
+                  key: item1Key,
+                  onExpansionChanged: (expanded) {
+                    if (expanded == true) {
+                      setState(() {
+                        item2Key = UniqueKey();
+                        item3Key = UniqueKey();
+                        item4Key = UniqueKey();
+                        item5Key = UniqueKey();
+                      });
+                    }
                   },
-                  child: ListTile(
-                    title: Text(
-                      subcategory.name,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                  // rest of the basic code
+                  title: const Text("Engineering"),
+                  children: [
+                    ListTile(
+                      title: const Text('Academic Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/engineering/academic');
+                      },
                     ),
-                  ),
-                );
-              }).toList(),
+                    ListTile(
+                      title: const Text('Cultural Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/engineering/cultural');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('NSS/NCC'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/engineering/nss_ncc');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Others'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/engineering/others');
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
-          );
-        }).toList(),
-      ),
-    );
+            const SizedBox(
+              height: 10,
+            ),
+            // Second
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  width: 2,
+                  color: primaryBckgnd,
+                ),
+              ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  textColor: primaryBckgnd,
+                  key: item2Key, // Unique Key we initialise in starting
+                  onExpansionChanged: (expanded) {
+                    if (expanded == true) {
+                      setState(() {
+                        item1Key = UniqueKey();
+                        item3Key = UniqueKey();
+                        item4Key = UniqueKey();
+                        item5Key = UniqueKey();
+                      });
+                    }
+                  },
+                  title: const Text("Medical"),
+                  children: [
+                    ListTile(
+                      title: const Text('Academic Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/medical/academic');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Cultural Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/medical/cultural');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('NSS/NCC'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/medical/nss_ncc');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Others'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/medical/others');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            // Third
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  width: 2,
+                  color: primaryBckgnd,
+                ),
+              ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  textColor: primaryBckgnd,
+                  key: item3Key, // Unique Key we initialise in starting
+                  onExpansionChanged: (expanded) {
+                    if (expanded == true) {
+                      setState(() {
+                        item1Key = UniqueKey();
+                        item2Key = UniqueKey();
+                        item4Key = UniqueKey();
+                        item5Key = UniqueKey();
+                      });
+                    }
+                  },
+                  title: const Text("Business"),
+                  children: [
+                    ListTile(
+                      title: const Text('Academic Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/business/academic');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Cultural Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/business/cultural');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('NSS/NCC'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/business/nss_ncc');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Others'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/business/others');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            // Fourth
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  width: 2,
+                  color: primaryBckgnd,
+                ),
+              ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  textColor: primaryBckgnd,
+                  key: item4Key,
+                  onExpansionChanged: (expanded) {
+                    if (expanded == true) {
+                      setState(() {
+                        item1Key = UniqueKey();
+                        item2Key = UniqueKey();
+                        item3Key = UniqueKey();
+                        item5Key = UniqueKey();
+                      });
+                    }
+                  },
+                  // rest of the basic code
+                  title: const Text("Law"),
+                  children: [
+                    ListTile(
+                      title: const Text('Academic Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/law/academic');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Cultural Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/law/cultural');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('NSS/NCC'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/law/nss_ncc');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Others'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/law/others');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            // Fifth
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  width: 2,
+                  color: primaryBckgnd,
+                ),
+              ),
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  textColor: primaryBckgnd,
+                  key: item5Key,
+                  onExpansionChanged: (expanded) {
+                    if (expanded == true) {
+                      setState(() {
+                        item1Key = UniqueKey();
+                        item2Key = UniqueKey();
+                        item3Key = UniqueKey();
+                        item4Key = UniqueKey();
+                      });
+                    }
+                  },
+                  // rest of the basic code
+                  title: const Text("Others"),
+                  children: [
+                    ListTile(
+                      title: const Text('Academic Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/other/academic');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Cultural Events'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/other/cultural');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('NSS/NCC'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/other/nss_ncc');
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Others'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/other/others');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ));
   }
-
-  List<Item> generateItems(List<Category> categories) {
-    return List<Item>.generate(categories.length, (int index) {
-      return Item(
-        id: index,
-        category: categories[index],
-      );
-    });
-  }
-}
-
-class Item {
-  Item({
-    required this.id,
-    required this.category,
-  });
-
-  int id;
-  Category category;
 }

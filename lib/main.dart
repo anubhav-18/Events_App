@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cu_events/view/admin/admin_Panel/add_events.dart';
-import 'package:cu_events/view/admin/admin_Panel/update_events/update_event_page.dart';
-import 'package:cu_events/view/admin/admin_Panel/update_events/update_events_tab.dart';
 import 'package:cu_events/view/admin/admin_login_screen.dart';
 import 'package:cu_events/view/admin/admin_panel.dart';
 import 'package:cu_events/constants.dart';
@@ -163,7 +159,7 @@ class MyApp extends StatelessWidget {
             const EventsPage(category: 'other', subcategory: 'others'),
         '/admin': (context) => const AdminPanel(),
         '/event_details': (context) => const EventDetailsPage(),
-        '/secret-admin-login': (context) => AdminLoginScreen(),
+        '/secret-admin-login': (context) => const AdminLoginScreen(),
         '/addEvents': (context) => const AddEventsPanel(),
       },
     );

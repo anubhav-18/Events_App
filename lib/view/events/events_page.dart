@@ -20,7 +20,7 @@ class EventsPage extends StatelessWidget {
     }
     return text
         .split(' ')
-        .map((word) => toBeginningOfSentenceCase(word) ?? '')
+        .map((word) => toBeginningOfSentenceCase(word))
         .join(' ');
   }
 
@@ -40,7 +40,7 @@ class EventsPage extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineLarge,
         ),
       ),
-      body: StreamBuilder<List<Event>>(
+      body: StreamBuilder<List<EventModel>>(
         stream: firestoreService.getEvents(category, subcategory),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -99,39 +99,19 @@ class EventsPage extends StatelessWidget {
                                   maxLines: 2,
                                   style: Theme.of(context)
                                       .textTheme
-                                      .headlineMedium,
+                                      .bodyLarge!.copyWith(color: primaryBckgnd),
                                 ),
                                 Text(
                                   event.description,
                                   overflow: TextOverflow.ellipsis,
-                                  maxLines: 4,
+                                  maxLines: 5,
                                   style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                InkWell(
-                                  onTap: () async {
-                                    final Uri url = Uri.parse(event.link);
-                                    if (!await launchUrl(
-                                      url,
-                                      mode: LaunchMode.externalApplication,
-                                    )) {
-                                      throw 'Could not launch $url';
-                                    }
-                                  },
-                                  child: Text(
-                                    event.link,
-                                    overflow: TextOverflow.fade,
-                                    maxLines: 2,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(color: Colors.blue),
-                                  ),
                                 ),
                                 Text(
                                   'Deadline: ${event.deadline.toString().split(' ')[0]}',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .bodySmall
+                                      .bodyMedium
                                       ?.copyWith(color: Colors.red),
                                 ),
                               ],

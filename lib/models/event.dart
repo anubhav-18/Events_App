@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Event {
+class EventModel {
   final String id;
   final String title;
   final String description;
@@ -10,8 +10,11 @@ class Event {
   final String link;
   final DateTime? deadline;
   final bool popular;
+  final DateTime? startdate;
+  final DateTime? enddate;
+  final String location;
 
-  Event({
+  EventModel({
     required this.id,
     required this.title,
     required this.description,
@@ -21,10 +24,13 @@ class Event {
     required this.link,
     required this.deadline,
     required this.popular,
+    required this.startdate,
+    required this.enddate,
+    required this.location,
   });
 
-  factory Event.fromFirestore(Map<String, dynamic> data, String id) {
-    return Event(
+  factory EventModel.fromFirestore(Map<String, dynamic> data, String id) {
+    return EventModel(
       id: id,
       title: data['title'] ?? '',
       description: data['description'] ?? '',
@@ -38,6 +44,17 @@ class Event {
               : DateTime.parse(data['deadline']))
           : null,
       popular: data['popular'] ?? false,
+      startdate: data['startdate'] != null
+          ? (data['startdate'] is Timestamp
+              ? (data['startdate'] as Timestamp).toDate()
+              : DateTime.parse(data['startdate']))
+          : null,
+      enddate: data['enddate'] != null
+          ? (data['enddate'] is Timestamp
+              ? (data['enddate'] as Timestamp).toDate()
+              : DateTime.parse(data['enddate']))
+          : null,
+      location: data['location'] ?? '',
     );
   }
 
@@ -51,6 +68,9 @@ class Event {
       'link': link,
       'deadline': deadline,
       'popular': popular,
+      'startdate': startdate,
+      'enddate': enddate,
+      'location': location,
     };
   }
 }

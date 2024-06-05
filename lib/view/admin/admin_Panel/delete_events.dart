@@ -218,3 +218,4 @@ class _DeleteEventsPageState extends State<DeleteEventsPage> {
     );
   }
 }
+

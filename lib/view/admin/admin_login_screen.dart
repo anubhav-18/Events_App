@@ -1,4 +1,3 @@
-import 'package:cu_events/constants.dart';
 import 'package:cu_events/reusable_widget/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,10 +16,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   void _login() async {
     try {
+      // ignore: unused_local_variable
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      // Navigate to admin panel on successful login
       Navigator.pushReplacementNamed(context, '/admin');
     } catch (e) {
       String errorMessage = "An error occurred";
