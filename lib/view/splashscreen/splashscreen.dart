@@ -1,32 +1,60 @@
 import 'dart:async';
-
+import 'package:cu_events/constants.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
   @override
   void initState() {
     super.initState();
-    Timer(
-      const Duration(seconds: 3),
-      () => Navigator.of(context).pushReplacementNamed('/home'),
-    );
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..forward();
+
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutQuad);
+
+    Timer(const Duration(seconds: 4), () { 
+      Navigator.of(context).pushReplacementNamed('/home');
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: primaryBckgnd,
       body: Center(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
-          width: MediaQuery.of(context).size.width * 0.5,
-          child: Image.asset('assets/icons/CUEVENTS-removebg.png'),
+        child: FadeTransition( 
+          opacity: _animation,
+          child: ScaleTransition( 
+            scale: _animation,
+            child: Container( 
+              padding: const EdgeInsets.all(10), 
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: Image.asset(
+                'assets/icons/logo/cuevents-removebg.png',
+                width: 240,  
+                height: 240,  
+              ),
+            ),
+          ),
         ),
       ),
     );

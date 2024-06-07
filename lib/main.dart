@@ -3,8 +3,11 @@ import 'package:cu_events/view/admin/admin_Panel/add_events.dart';
 import 'package:cu_events/view/admin/admin_login_screen.dart';
 import 'package:cu_events/view/admin/admin_panel.dart';
 import 'package:cu_events/constants.dart';
+import 'package:cu_events/view/categories/category_view.dart';
+import 'package:cu_events/view/drawer/about_us.dart';
+import 'package:cu_events/view/drawer/feedback.dart';
+import 'package:cu_events/view/events/all_events.dart';
 import 'package:cu_events/view/events/events_details.dart';
-import 'package:cu_events/view/events/events_page.dart';
 import 'package:cu_events/firebase_options.dart';
 import 'package:cu_events/view/home/homepage.dart';
 import 'package:cu_events/controller/notification.dart';
@@ -104,63 +107,35 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: primaryBckgnd,
           iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-            fontSize: 34,
-            color: whiteColor,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Acme',
-          ),
+          titleTextStyle:  TextStyle(
+              fontSize: 34,
+              color: whiteColor,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Acme',
+            ),
+          // GoogleFonts.montserrat(
+          //   textStyle: TextStyle(
+          //     fontSize: 34,
+          //     color: whiteColor,
+          //     fontWeight: FontWeight.bold,
+          //     fontFamily: 'Acme',
+          //   ),
+          // ),
         ),
         colorScheme: ColorScheme.fromSeed(seedColor: primaryBckgnd),
       ),
       initialRoute: '/',
-      home: const SplashScreen(),
+      home: SplashScreen(),
       routes: {
         '/home': (context) => const Homepage(),
-        '/engineering/academic': (context) =>
-            const EventsPage(category: 'engineering', subcategory: 'academic'),
-        '/engineering/cultural': (context) =>
-            const EventsPage(category: 'engineering', subcategory: 'cultural'),
-        '/engineering/nss_ncc': (context) =>
-            const EventsPage(category: 'engineering', subcategory: 'nss_ncc'),
-        '/engineering/others': (context) =>
-            const EventsPage(category: 'engineering', subcategory: 'others'),
-        '/medical/academic': (context) =>
-            const EventsPage(category: 'medical', subcategory: 'academic'),
-        '/medical/cultural': (context) =>
-            const EventsPage(category: 'medical', subcategory: 'cultural'),
-        '/medical/nss_ncc': (context) =>
-            const EventsPage(category: 'medical', subcategory: 'nss_ncc'),
-        '/medical/others': (context) =>
-            const EventsPage(category: 'medical', subcategory: 'others'),
-        '/business/academic': (context) =>
-            const EventsPage(category: 'business', subcategory: 'academic'),
-        '/business/cultural': (context) =>
-            const EventsPage(category: 'business', subcategory: 'cultural'),
-        '/business/nss_ncc': (context) =>
-            const EventsPage(category: 'business', subcategory: 'nss_ncc'),
-        '/business/others': (context) =>
-            const EventsPage(category: 'business', subcategory: 'others'),
-        '/law/academic': (context) =>
-            const EventsPage(category: 'law', subcategory: 'academic'),
-        '/law/cultural': (context) =>
-            const EventsPage(category: 'law', subcategory: 'cultural'),
-        '/law/nss_ncc': (context) =>
-            const EventsPage(category: 'law', subcategory: 'nss_ncc'),
-        '/law/others': (context) =>
-            const EventsPage(category: 'law', subcategory: 'others'),
-        '/other/academic': (context) =>
-            const EventsPage(category: 'other', subcategory: 'academic'),
-        '/other/cultural': (context) =>
-            const EventsPage(category: 'other', subcategory: 'cultural'),
-        '/other/nss_ncc': (context) =>
-            const EventsPage(category: 'other', subcategory: 'nss_ncc'),
-        '/other/others': (context) =>
-            const EventsPage(category: 'other', subcategory: 'others'),
         '/admin': (context) => const AdminPanel(),
         '/event_details': (context) => const EventDetailsPage(),
         '/secret-admin-login': (context) => const AdminLoginScreen(),
         '/addEvents': (context) => const AddEventsPanel(),
+        '/allevents': (context) => const AllEventsPage(),
+        '/feedback': (context) => const FeedbackPage(),
+        '/aboutus': (context) => const AboutUsPage(),
+        '/category': (context) => const CategoriesPage(),
       },
     );
   }

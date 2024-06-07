@@ -1,5 +1,6 @@
 import 'package:cu_events/constants.dart';
 import 'package:cu_events/reusable_widget/custom_button.dart';
+import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -69,19 +70,11 @@ class _DeleteEventsPageState extends State<DeleteEventsPage> {
           .collection('events')
           .doc(eventId)
           .delete();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Event deleted successfully'),
-        ),
-      );
+      showCustomSnackBar(context, 'Event deleted successfully');
       _fetchEvents(); // Refresh events after deletion
     } catch (e) {
       print('Failed to delete event: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to delete event'),
-        ),
-      );
+      showCustomSnackBar(context, 'Failed to delete event');
     }
   }
 
@@ -193,14 +186,18 @@ class _DeleteEventsPageState extends State<DeleteEventsPage> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text('No',),
+                                        child: const Text(
+                                          'No',
+                                        ),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           _deleteEvent(event.id);
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text('Yes',),
+                                        child: const Text(
+                                          'Yes',
+                                        ),
                                       ),
                                     ],
                                   );
@@ -218,4 +215,3 @@ class _DeleteEventsPageState extends State<DeleteEventsPage> {
     );
   }
 }
-

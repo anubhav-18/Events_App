@@ -1,3 +1,4 @@
+import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:cu_events/view/admin/admin_Panel/add_events.dart';
 import 'package:cu_events/view/admin/admin_Panel/delete_events.dart';
 import 'package:cu_events/view/admin/admin_Panel/update_events/update_events_tab.dart';
@@ -53,13 +54,7 @@ class _AdminPanelState extends State<AdminPanel>
           Navigator.pushReplacementNamed(context, '/home');
         });
         SchedulerBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                "You are not ADMIN.",
-              ),
-            ),
-          );
+          showCustomSnackBar(context, "You are not ADMIN.");
         });
       }
     }

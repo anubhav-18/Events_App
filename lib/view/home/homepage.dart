@@ -1,12 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cu_events/view/home/event_categories/event_categories.dart';
-import 'package:cu_events/reusable_widget/cachedImage.dart';
+import 'package:cu_events/firestore_service.dart';
 import 'package:cu_events/constants.dart';
 import 'package:cu_events/models/event.dart';
+import 'package:cu_events/view/events/events_page.dart';
+import 'package:cu_events/view/home/Sections/app_drawer_section.dart';
+import 'package:cu_events/view/home/Sections/categories_section.dart';
+import 'package:cu_events/view/home/Sections/popular_event_section.dart';
+import 'package:cu_events/view/home/Sections/upcoming_event_section.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -16,36 +17,84 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  final CarouselController _carouselController = CarouselController();
+
+  final FirestoreService _firestoreService = FirestoreService();
+  List<EventModel> _popularEvents = [];
+  List<EventModel> _upcomingEvents = [];
+  List<EventModel> _filteredEvents = [];
+  bool _isLoading = true;
+  String? _selectedCategory;
+
   void _incrementTap() {
     setState(() {
       Navigator.pushNamed(context, '/secret-admin-login');
     });
   }
 
-  List<EventModel> popularEvents = [];
-  bool isLoading = true;
-  int _currentIndex = 0;
-  final CarouselController _carouselController = CarouselController();
-
   @override
   void initState() {
-    fetchPopularEvents();
     super.initState();
+    _fetchEvents();
   }
 
-  Future<void> fetchPopularEvents() async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('events')
-        .where('popular', isEqualTo: true)
-        .get();
-
-    setState(() {
-      popularEvents = snapshot.docs.map((doc) {
-        return EventModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
-      }).toList();
-      isLoading = false;
-    });
+  Future<void> _fetchEvents() async {
+    try {
+      _popularEvents = await _firestoreService.getPopularEvents();
+      _upcomingEvents = await _firestoreService.getUpcomingEvents();
+    } catch (e) {
+      print('Error fetching events: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+        _filteredEvents = _upcomingEvents;
+      });
+    }
   }
+
+  // Handle category selection
+  void _onCategorySelected(String category) async {
+  final subcategories = _categoriesAndSubcategories[category];
+
+  // Check if the category has subcategories
+  if (subcategories != null && subcategories.isNotEmpty) {
+    // If it has subcategories, show a dialog to select one
+    String? selectedSubcategory = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text('Select Subcategory'),
+        children: subcategories.map((subcategory) {
+          return SimpleDialogOption(
+            child: Text(subcategory),
+            onPressed: () {
+              Navigator.pop(context, subcategory);
+            },
+          );
+        }).toList(),
+      ),
+    );
+
+    // Navigate to the filtered events page with the selected subcategory
+    if (selectedSubcategory != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              EventsPage(category: category, subcategory: selectedSubcategory),
+        ),
+      );
+    }
+  } else {
+    // If it doesn't have subcategories, directly navigate to the filtered events page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EventsPage(category: category,),
+      ),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -70,167 +119,52 @@ class _HomepageState extends State<Homepage> {
         centerTitle: true,
         elevation: 8,
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: screenSize > 600 ? AppMargins.large : AppMargins.medium,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Popular Events',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              Container(
-                margin: const EdgeInsets.only(top: 10, bottom: 10),
-                child: isLoading
-                    ? const Center(
-                        child: SpinKitChasingDots(
-                          color: textColor,
-                        ),
-                      )
-                    : popularEvents.isNotEmpty
-                        ? Column(
-                            children: [
-                              CarouselSlider(
-                                items: popularEvents.map((event) {
-                                  return Center(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context, '/event_details',
-                                            arguments: event);
-                                      },
-                                      child: CachedImage(
-                                        imageUrl: event.imageUrl,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.4,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.75,
-                                        boxFit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                                carouselController: _carouselController,
-                                options: CarouselOptions(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.4,
-                                  autoPlay: true,
-                                  autoPlayInterval: const Duration(seconds: 6),
-                                  autoPlayAnimationDuration:
-                                      const Duration(milliseconds: 800),
-                                  autoPlayCurve: Curves.fastOutSlowIn,
-                                  enlargeCenterPage: true,
-                                  onPageChanged: (index, reason) {
-                                    setState(() {
-                                      _currentIndex = index;
-                                    });
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              AnimatedSmoothIndicator(
-                                activeIndex: _currentIndex,
-                                count: popularEvents.length,
-                                effect: const ScrollingDotsEffect(
-                                  activeDotColor: primaryBckgnd,
-                                  activeDotScale: 1.5,
-                                  dotColor: Colors.grey,
-                                  dotHeight: 8,
-                                  dotWidth: 8,
-                                ),
-                                onDotClicked: (index) {
-                                  _carouselController.animateToPage(index);
-                                },
-                              ),
-                            ],
-                          )
-                        : const Center(
-                            child: Text(
-                              'There are no popular events',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-              ),
-              Text(
-                'Events Categories',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 10),
-              const ExpansionTileRadio(),
-              const SizedBox(height: 20),
-            ],
+      body: RefreshIndicator(
+        onRefresh: _fetchEvents,
+        child: SingleChildScrollView(
+          child: Container(
+            margin: screenSize > 600 ? AppMargins.large : AppMargins.medium,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Popular Section
+                PopularEventsCarousel(
+                  popularEvents: _popularEvents,
+                  isLoading: _isLoading,
+                ),
+                // Categories Section
+                EventCategorySelector(
+                  categoriesAndSubcategories: _categoriesAndSubcategories,
+                  selectedCategory: _selectedCategory,
+                  onCategorySelected: _onCategorySelected,
+                  isLoading: _isLoading,
+                ),
+                const SizedBox(height: 20),
+                // Upcoming Events Section
+                UpcomingEventsList(
+                  upcomingEvents: _upcomingEvents,
+                  isLoading: _isLoading,
+                ),
+                const SizedBox(height: 10),
+                // const ExpansionTileRadio(),
+                // const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
-      drawer: Drawer(
-        width: MediaQuery.of(context).size.width * 1,
-        child: ListView(
-          padding: const EdgeInsets.all(0),
-          children: [
-            Container(
-              alignment: Alignment.center,
-              color: primaryBckgnd,
-              padding:
-                  const EdgeInsets.only(left: 5, right: 8, top: 22, bottom: 10),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: whiteColor,
-                      size: 30,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Center(
-                    child: Text(
-                      'Hey, CUIANS',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.policy,
-                size: 30,
-                color: iconColor,
-              ),
-              title: Text(
-                ' Privacy Policy ',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.call,
-                size: 30,
-                color: iconColor,
-              ),
-              title: Text(
-                ' Contact US ',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const AppDrawer(),
     );
   }
+
+  final Map<String, List<String>> _categoriesAndSubcategories = {
+    'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
+    'Sports': [],
+    'Cultural': [],
+    'Tech': ['Hackathon', 'Coding Competition', 'Webinar', 'Workshop'],
+    'Arts & Entertainment': ['Music', 'Dance', 'Drama', 'Film'],
+    '  Business & Career ': ['Networking', 'Job Fair', 'Startup Pitch'],
+    'Health & Wellness': ['Yoga', 'Meditation', 'Fitness'],
+    'Others': ['Social', 'Party', 'Festival'],
+  };
 }

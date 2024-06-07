@@ -4,17 +4,109 @@ import 'package:cu_events/models/event.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Stream<List<EventModel>> getEvents(String category, String subcategory) {
-    return _db.collection('events')
-              .where('category', isEqualTo: category)
-              .where('subcategory', isEqualTo: subcategory)
-              .snapshots()
-              .map((snapshot) => snapshot.docs
-                .map((doc) => EventModel.fromFirestore(doc.data(), doc.id))
-                .toList());
+  // All Events
+  Future<List<EventModel>> getAllEvents() async {
+    QuerySnapshot snapshot = await _db.collection('events').get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
   }
 
-  Future<void> addEvent(EventModel event) {
-    return _db.collection('events').add(event.toFirestore());
+  // Events By category and subCategory
+  Future<List<EventModel>> getEventsByCategoryAndSubcategory(
+      String category, String? subcategory) async {
+    // Create a query based on category
+    Query query =
+        _db.collection('events').where('category', isEqualTo: category);
+
+    // Add subcategory filter if provided
+    if (subcategory != null && subcategory.isNotEmpty) {
+      query = query.where('subcategory', isEqualTo: subcategory);
+    }
+
+    QuerySnapshot snapshot = await query.get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  // Popluar Events
+  Future<List<EventModel>> getPopularEvents() async {
+    QuerySnapshot snapshot =
+        await _db.collection('events').where('popular', isEqualTo: true).get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  // Upcoming Events
+  Future<List<EventModel>> getUpcomingEvents() async {
+    QuerySnapshot snapshot = await _db
+        .collection('events')
+        .where('startdate', isGreaterThanOrEqualTo: DateTime.now())
+        .get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  // Add Event
+  Future<void> addEvent(EventModel event) async {
+    try {
+      await _db.collection('events').add(event.toFirestore());
+    } catch (e) {
+      // Handle errors (show error message, log, etc.)
+      print('Error adding event: $e');
+      throw e; // Re-throw the error to be handled in the UI
+    }
+  }
+
+  // Update Event
+  Future<void> updateEvent(EventModel event) async {
+    try {
+      await _db
+          .collection('events')
+          .doc(event.id) // Assuming you have the event ID
+          .update(event.toFirestore());
+    } catch (e) {
+      print('Error updating event: $e');
+      throw e;
+    }
+  }
+
+  // Delete Event
+  Future<void> deleteEvent(String eventId) async {
+    try {
+      await _db.collection('events').doc(eventId).delete();
+    } catch (e) {
+      print('Error deleting event: $e');
+      throw e;
+    }
+  }
+
+  Future<void> addFeedback(
+      String name, String? email, String category, String feedback) async {
+    try {
+      final feedbackData = {
+        'name': name,
+        'email': email, // Store email even if it's null
+        'category': category,
+        'text': feedback,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      await _db.collection('feedback').add(feedbackData);
+    } catch (e) {
+      print('Error adding feedback: $e');
+      throw e; // Re-throw the error to be handled in the UI
+    }
   }
 }

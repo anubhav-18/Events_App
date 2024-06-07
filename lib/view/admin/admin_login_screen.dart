@@ -1,4 +1,5 @@
 import 'package:cu_events/reusable_widget/custom_button.dart';
+import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -42,8 +43,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         }
       }
       print(errorMessage);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(errorMessage)));
+      showCustomSnackBar(context, errorMessage);
     }
   }
 

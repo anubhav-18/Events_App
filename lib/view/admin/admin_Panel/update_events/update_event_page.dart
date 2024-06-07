@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cu_events/reusable_widget/custom_button.dart';
+import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -344,11 +345,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
       if (imageUrl != null) {
         eventData['imageUrl'] = imageUrl;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to upload image'),
-          ),
-        );
+        showCustomSnackBar(context, 'Failed to upload image');
         return;
       }
     }
@@ -358,18 +355,10 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
           .collection('events')
           .doc(eventId)
           .update(eventData);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Event updated successfully'),
-        ),
-      );
+      showCustomSnackBar(context, 'Event updated successfully');
     } catch (e) {
       print('Failed to update event: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update event'),
-        ),
-      );
+      showCustomSnackBar(context, 'Failed to update event');
     }
   }
 

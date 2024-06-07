@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:cu_events/firestore_service.dart';
 import 'package:cu_events/models/event.dart';
 import 'package:cu_events/reusable_widget/custom_button.dart';
+import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
@@ -24,24 +25,29 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
   DateTime _enddate = DateTime.now();
   DateTime _deadline = DateTime.now();
   bool _popular = false;
-  String _selectedCategory = 'engineering';
-  String _selectedSubcategory = 'academic';
   File? _image;
   bool _isLoading = false;
+  String? _selectedCategory;
+  List<String> _currentSubcategories = [];
+  String? _selectedSubcategory;
+  final Map<String, List<String>> _categoriesAndSubcategories = {
+    'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
+    'Sports': [],
+    'Cultural': [],
+    'Tech': ['Hackathon', 'Coding Competition', 'Webinar', 'Workshop'],
+    'Arts & Entertainment': ['Music', 'Dance', 'Drama', 'Film'],
+    'Business & Career': ['Networking', 'Job Fair', 'Startup Pitch'],
+    'Health & Wellness': ['Yoga', 'Meditation', 'Fitness'],
+    'Others': ['Social', 'Party', 'Festival'],
+  };
+  final FirestoreService _firestoreService = FirestoreService();
 
-  final List<String> _categories = [
-    'engineering',
-    'medical',
-    'law',
-    'business',
-    'other'
-  ];
-  final List<String> _subcategories = [
-    'academic',
-    'cultural',
-    'nss_ncc',
-    'others'
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _currentSubcategories =
+        _categoriesAndSubcategories[_selectedCategory] ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,8 +277,11 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
               // category
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                items: _categories.map((category) {
-                  return DropdownMenuItem(
+                items: _categoriesAndSubcategories.keys
+                    .toSet()
+                    .toList()
+                    .map((category) {
+                  return DropdownMenuItem<String>(
                     value: category,
                     child: Text(category),
                   );
@@ -280,33 +289,44 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
                 onChanged: (value) {
                   setState(() {
                     _selectedCategory = value!;
+                    _currentSubcategories =
+                        _categoriesAndSubcategories[_selectedCategory] ?? [];
+
+                    _selectedSubcategory = _currentSubcategories.isNotEmpty
+                        ? _currentSubcategories.first
+                        : null;
                   });
                 },
                 decoration: InputDecoration(
                   labelText: 'Category',
                   labelStyle: Theme.of(context).textTheme.headlineMedium,
                 ),
+                validator: (value) =>
+                    value == null ? 'Category is required' : null,
               ),
               const SizedBox(height: 20),
-              // Subcategory
-              DropdownButtonFormField<String>(
-                value: _selectedSubcategory,
-                items: _subcategories.map((subcategory) {
-                  return DropdownMenuItem(
-                    value: subcategory,
-                    child: Text(subcategory),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedSubcategory = value!;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Subcategory',
-                  labelStyle: Theme.of(context).textTheme.headlineMedium,
+
+              // Subcategory Dropdown (Conditional)
+              if (_currentSubcategories.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: _selectedSubcategory,
+                  items:
+                      _currentSubcategories.toSet().toList().map((subcategory) {
+                    return DropdownMenuItem<String>(
+                      value: subcategory,
+                      child: Text(subcategory),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedSubcategory = value!;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Subcategory',
+                    labelStyle: Theme.of(context).textTheme.headlineMedium,
+                  ),
                 ),
-              ),
               const SizedBox(height: 20),
               // Button on Submit
               elevatedButton(
@@ -337,8 +357,8 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
           description: _descriptionController.text,
           imageUrl: imageUrl,
           link: _linkController.text,
-          category: _selectedCategory,
-          subcategory: _selectedSubcategory,
+          category: _selectedCategory ?? '',
+          subcategory: _selectedSubcategory ?? '',
           deadline: _deadline,
           popular: _popular,
           startdate: _startdate,
@@ -346,35 +366,34 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
           location: _locationController.text,
         );
 
-        await FirebaseFirestore.instance
-            .collection('events')
-            .add(event.toFirestore());
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Event added successfully'),
-          ),
-        );
+        try {
+          await _firestoreService.addEvent(event);
 
-        setState(() {
-          _isLoading = false;
-          _formKey.currentState!.reset();
-          _titleController.clear();
-          _descriptionController.clear();
-          _linkController.clear();
-          _selectedCategory = 'engineering';
-          _selectedSubcategory = 'academic';
-          _image = null;
-          _deadline = DateTime.now();
-          _locationController.clear();
-          _enddate = DateTime.now();
-          _startdate = DateTime.now();
-        });
+          showCustomSnackBar(context, 'Event added successfully');
+
+          setState(() {
+            _isLoading = false;
+            _formKey.currentState!.reset();
+            _titleController.clear();
+            _descriptionController.clear();
+            _linkController.clear();
+            _selectedCategory = null;
+            _selectedSubcategory = null;
+            _image = null;
+            _deadline = DateTime.now();
+            _locationController.clear();
+            _enddate = DateTime.now();
+            _startdate = DateTime.now();
+          });
+        } catch (error) {
+          showCustomSnackBar(context, 'Error adding event: $error');
+
+          setState(() {
+            _isLoading = false; // Hide loading indicator
+          });
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to upload image'),
-          ),
-        );
+        showCustomSnackBar(context, 'Failed to upload image');
         setState(() {
           _isLoading = false;
         });
