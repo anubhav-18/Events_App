@@ -71,8 +71,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child:
-                    elevatedButton(context, _login, 'Login', double.infinity),
+                child: CustomElevatedButton(
+                  onPressed: _login,
+                  title: 'Login',
+                  width: double.infinity,
+                  height: null,
+                ),
               ),
             ),
           ],

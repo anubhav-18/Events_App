@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cu_events/models/event.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:cu_events/reusable_widget/cachedImage.dart';
-import 'package:cu_events/firestore_service.dart';
+import 'package:cu_events/controller/firestore_service.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import for Google Fonts

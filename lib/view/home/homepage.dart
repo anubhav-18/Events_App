@@ -1,8 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cu_events/firestore_service.dart';
+import 'package:cu_events/controller/firestore_service.dart';
 import 'package:cu_events/constants.dart';
-import 'package:cu_events/models/event.dart';
-import 'package:cu_events/view/events/events_page.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:cu_events/view/home/Sections/app_drawer_section.dart';
 import 'package:cu_events/view/home/Sections/categories_section.dart';
 import 'package:cu_events/view/home/Sections/popular_event_section.dart';
@@ -52,50 +51,6 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  // Handle category selection
-  void _onCategorySelected(String category) async {
-  final subcategories = _categoriesAndSubcategories[category];
-
-  // Check if the category has subcategories
-  if (subcategories != null && subcategories.isNotEmpty) {
-    // If it has subcategories, show a dialog to select one
-    String? selectedSubcategory = await showDialog<String>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: Text('Select Subcategory'),
-        children: subcategories.map((subcategory) {
-          return SimpleDialogOption(
-            child: Text(subcategory),
-            onPressed: () {
-              Navigator.pop(context, subcategory);
-            },
-          );
-        }).toList(),
-      ),
-    );
-
-    // Navigate to the filtered events page with the selected subcategory
-    if (selectedSubcategory != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              EventsPage(category: category, subcategory: selectedSubcategory),
-        ),
-      );
-    }
-  } else {
-    // If it doesn't have subcategories, directly navigate to the filtered events page
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EventsPage(category: category,),
-      ),
-    );
-  }
-}
-
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size.width;
@@ -134,9 +89,7 @@ class _HomepageState extends State<Homepage> {
                 ),
                 // Categories Section
                 EventCategorySelector(
-                  categoriesAndSubcategories: _categoriesAndSubcategories,
                   selectedCategory: _selectedCategory,
-                  onCategorySelected: _onCategorySelected,
                   isLoading: _isLoading,
                 ),
                 const SizedBox(height: 20),
@@ -146,8 +99,6 @@ class _HomepageState extends State<Homepage> {
                   isLoading: _isLoading,
                 ),
                 const SizedBox(height: 10),
-                // const ExpansionTileRadio(),
-                // const SizedBox(height: 20),
               ],
             ),
           ),
@@ -156,15 +107,4 @@ class _HomepageState extends State<Homepage> {
       drawer: const AppDrawer(),
     );
   }
-
-  final Map<String, List<String>> _categoriesAndSubcategories = {
-    'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
-    'Sports': [],
-    'Cultural': [],
-    'Tech': ['Hackathon', 'Coding Competition', 'Webinar', 'Workshop'],
-    'Arts & Entertainment': ['Music', 'Dance', 'Drama', 'Film'],
-    '  Business & Career ': ['Networking', 'Job Fair', 'Startup Pitch'],
-    'Health & Wellness': ['Yoga', 'Meditation', 'Fitness'],
-    'Others': ['Social', 'Party', 'Festival'],
-  };
 }

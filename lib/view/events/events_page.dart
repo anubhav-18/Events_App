@@ -1,8 +1,8 @@
 import 'package:cu_events/reusable_widget/cachedImage.dart';
 import 'package:cu_events/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:cu_events/firestore_service.dart';
-import 'package:cu_events/models/event.dart';
+import 'package:cu_events/controller/firestore_service.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -67,7 +67,6 @@ class _EventsPageState extends State<EventsPage> {
       appBar: AppBar(
         title: Text(
           '${widget.subcategory != null ? toBeginningOfSentenceCase(widget.subcategory!) : toBeginningOfSentenceCase(widget.category)} Events',
-          style: Theme.of(context).textTheme.headlineLarge,
         ),
       ),
       body: RefreshIndicator(

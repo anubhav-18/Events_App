@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 const primaryBckgnd = Color(0xffde3163);
-const backgndColor = Color(0xfffff0f5);
+// const backgndColor = Color(0xfffff0f5);
+const backgndColor = Colors.white;
 const textColor =  Color(0xff000000);
 const whiteColor = Colors.white;
 const iconColor = Color(0xffde3163);

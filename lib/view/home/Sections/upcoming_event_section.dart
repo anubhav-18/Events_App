@@ -1,7 +1,7 @@
 // upcoming_events_list.dart
 import 'package:cu_events/reusable_widget/cachedImage.dart';
 import 'package:flutter/material.dart';
-import 'package:cu_events/models/event.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:shimmer/shimmer.dart';
 
 class UpcomingEventsList extends StatelessWidget {

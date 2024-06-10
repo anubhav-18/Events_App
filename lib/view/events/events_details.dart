@@ -8,7 +8,7 @@ import 'package:cu_events/controller/notification.dart';
 import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:cu_events/models/event.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
@@ -87,7 +87,6 @@ class _EventDetailsPageState extends State<EventDetailsPage>
         title: imageName,
         body: 'Download Complete',
         payload: imageUrl,
-        
       );
     }
 
@@ -226,8 +225,6 @@ class _EventDetailsPageState extends State<EventDetailsPage>
       );
     }
 
-    
-    
     return Scaffold(
       backgroundColor: backgndColor,
       body: Stack(

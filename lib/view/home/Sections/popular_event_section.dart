@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cu_events/constants.dart';
-import 'package:cu_events/models/event.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:cu_events/reusable_widget/cachedImage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

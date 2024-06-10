@@ -1,4 +1,4 @@
-import 'package:cu_events/firestore_service.dart';
+import 'package:cu_events/controller/firestore_service.dart';
 import 'package:cu_events/view/events/events_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/constants.dart';

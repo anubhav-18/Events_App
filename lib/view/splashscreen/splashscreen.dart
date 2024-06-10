@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:cu_events/constants.dart';
+import 'package:cu_events/controller/user_logged_inout.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -20,10 +23,15 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     )..forward();
 
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutQuad);
+    _animation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeOutQuad);
 
-    Timer(const Duration(seconds: 4), () { 
-      Navigator.of(context).pushReplacementNamed('/home');
+    Timer(const Duration(seconds: 4), () { // Adjust timing as needed
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute( // Use MaterialPageRoute to pass context to AuthGate
+          builder: (context) => const AuthGate(),
+        ),
+      );
     });
   }
 
@@ -38,20 +46,20 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: primaryBckgnd,
       body: Center(
-        child: FadeTransition( 
+        child: FadeTransition(
           opacity: _animation,
-          child: ScaleTransition( 
+          child: ScaleTransition(
             scale: _animation,
-            child: Container( 
-              padding: const EdgeInsets.all(10), 
+            child: Container(
+              padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
               ),
               child: Image.asset(
                 'assets/icons/logo/cuevents-removebg.png',
-                width: 240,  
-                height: 240,  
+                width: 240,
+                height: 240,
               ),
             ),
           ),

@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:cu_events/firestore_service.dart';
-import 'package:cu_events/models/event.dart';
+import 'package:cu_events/controller/firestore_service.dart';
+import 'package:cu_events/models/event_model.dart';
 import 'package:cu_events/reusable_widget/custom_button.dart';
 import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
@@ -130,24 +130,21 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
               ),
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
-                      final selectedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(DateTime.now().year + 1),
-                      );
-                      if (selectedDate != null) {
-                        setState(() {
-                          _deadline = selectedDate;
-                        });
-                      }
-                    },
-                    'Select Deadline',
-                    null,
-                  ),
+                  CustomElevatedButton(
+                      onPressed: () async {
+                        final selectedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(DateTime.now().year + 1),
+                        );
+                        if (selectedDate != null) {
+                          setState(() {
+                            _deadline = selectedDate;
+                          });
+                        }
+                      },
+                      title: 'Select Deadline'),
                   const SizedBox(width: 8.0),
                   Text(_deadline.toString().split(' ')[0],
                       style: Theme.of(context).textTheme.bodyLarge),
@@ -161,9 +158,8 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
               ),
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
+                  CustomElevatedButton(
+                    onPressed: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
                         initialDate: _startdate,
@@ -188,8 +184,7 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
                         }
                       }
                     },
-                    'Select StartDate',
-                    null,
+                    title: 'Select StartDate',
                   ),
                   const SizedBox(width: 8.0),
                   Text(dateFormat.format(_startdate),
@@ -204,9 +199,8 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
               ),
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
+                  CustomElevatedButton(
+                    onPressed: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
                         initialDate: _enddate,
@@ -231,8 +225,7 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
                         }
                       }
                     },
-                    'Select EndDate',
-                    null,
+                    title: 'Select EndDate',
                   ),
                   const SizedBox(width: 8.0),
                   Text(dateFormat.format(_enddate),
@@ -247,9 +240,8 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
               ),
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
+                  CustomElevatedButton(
+                    onPressed: () async {
                       final pickedFile = await ImagePicker().pickImage(
                         source: ImageSource.gallery,
                         imageQuality: 50,
@@ -262,8 +254,7 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
                         }
                       });
                     },
-                    'Pick Image',
-                    null,
+                    title: 'Pick Image',
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -329,12 +320,8 @@ class _AddEventsPanelState extends State<AddEventsPanel> {
                 ),
               const SizedBox(height: 20),
               // Button on Submit
-              elevatedButton(
-                context,
-                _isLoading ? null : _addEvent,
-                'Add Event',
-                double.infinity,
-              ),
+              CustomElevatedButton(
+                  onPressed: _isLoading ? null : _addEvent, title: 'Add Event'),
               const SizedBox(height: 20),
             ],
           ),

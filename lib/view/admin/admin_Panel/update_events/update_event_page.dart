@@ -152,9 +152,8 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
               // deadline
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
+                  CustomElevatedButton(
+                    onPressed: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
                         initialDate: deadline ?? DateTime.now(),
@@ -167,8 +166,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                         });
                       }
                     },
-                    'Deadline',
-                    null,
+                    title: 'Deadline',
                   ),
                   const SizedBox(width: 10),
                   Text('${deadline?.toString().split(' ')[0]}'),
@@ -178,9 +176,8 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
               // startDate
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
+                  CustomElevatedButton(
+                    onPressed: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
                         initialDate: startdate ?? DateTime.now(),
@@ -206,8 +203,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                         }
                       }
                     },
-                    'StartDate',
-                    null,
+                    title: 'StartDate',
                   ),
                   const SizedBox(width: 5),
                   Text(startdate != null ? dateFormat.format(startdate!) : ''),
@@ -217,9 +213,8 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
               // endDate
               Row(
                 children: [
-                  elevatedButton(
-                    context,
-                    () async {
+                  CustomElevatedButton(
+                    onPressed: () async {
                       final selectedDate = await showDatePicker(
                         context: context,
                         initialDate: enddate ?? DateTime.now(),
@@ -245,8 +240,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                         }
                       }
                     },
-                    'EndDate',
-                    null,
+                    title: 'EndDate',
                   ),
                   const SizedBox(width: 5),
                   Text(enddate != null ? dateFormat.format(enddate!) : ''),
@@ -256,17 +250,20 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
               // image picker
               Row(
                 children: [
-                  elevatedButton(context, () async {
-                    final pickedFile = await ImagePicker().pickImage(
-                      source: ImageSource.gallery,
-                      imageQuality: 50,
-                    );
-                    if (pickedFile != null) {
-                      setState(() {
-                        _image = File(pickedFile.path);
-                      });
-                    }
-                  }, 'Image', null),
+                  CustomElevatedButton(
+                    onPressed: () async {
+                      final pickedFile = await ImagePicker().pickImage(
+                        source: ImageSource.gallery,
+                        imageQuality: 50,
+                      );
+                      if (pickedFile != null) {
+                        setState(() {
+                          _image = File(pickedFile.path);
+                        });
+                      }
+                    },
+                    title: 'Image',
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -281,9 +278,8 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
               // submit button or loading indicator
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : elevatedButton(
-                      context,
-                      () {
+                  : CustomElevatedButton(
+                      onPressed: () {
                         setState(() {
                           _isLoading = true;
                         });
@@ -306,8 +302,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                           Navigator.pop(context); // Close the page
                         });
                       },
-                      'Save Changes',
-                      double.infinity,
+                      title: 'Save Changes',
                     ),
             ],
           ),
@@ -375,5 +370,4 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
       return null;
     }
   }
-
 }

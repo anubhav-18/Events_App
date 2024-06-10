@@ -1,21 +1,23 @@
+import 'package:cu_events/view/events/events_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/constants.dart';
 import 'package:shimmer/shimmer.dart';
 
-class EventCategorySelector extends StatelessWidget {
-  final Map<String, List<String>> categoriesAndSubcategories;
+class EventCategorySelector extends StatefulWidget {
   final String? selectedCategory;
-  final Function(String) onCategorySelected;
   final bool isLoading;
 
   const EventCategorySelector({
     Key? key,
-    required this.categoriesAndSubcategories,
     required this.selectedCategory,
-    required this.onCategorySelected,
     required this.isLoading,
   }) : super(key: key);
 
+  @override
+  State<EventCategorySelector> createState() => _EventCategorySelectorState();
+}
+
+class _EventCategorySelectorState extends State<EventCategorySelector> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -28,19 +30,19 @@ class EventCategorySelector extends StatelessWidget {
               ),
         ),
         const SizedBox(height: 10),
-        isLoading
+        widget.isLoading
             ? _buildCategoryShimmer(context)
             : GridView.count(
                 crossAxisCount: 2, // Two columns in the grid
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                children: categoriesAndSubcategories.keys.map((category) {
+                children: _categoriesAndSubcategories.keys.map((category) {
                   return CategoryGridItem(
                     category: category,
                     backgroundImage: _getBackgroundImageForCategory(category),
                     textColor: textColor,
-                    isSelected: category == selectedCategory,
-                    onTap: () => onCategorySelected(category),
+                    isSelected: category == widget.selectedCategory,
+                    onTap: () => _onCategorySelected(category, context),
                   );
                 }).toList(),
               ),
@@ -70,11 +72,137 @@ class EventCategorySelector extends StatelessWidget {
       ),
     );
   }
+
+  void _onCategorySelected(String category, BuildContext context) async {
+    final subcategories = _categoriesAndSubcategories[category];
+
+    // Check if the category has subcategories
+    if (subcategories != null && subcategories.isNotEmpty) {
+      // If it has subcategories, show a dialog to select one
+      String? selectedSubcategory = await showDialog(
+        context: context,
+        builder: (context) => _buildSubcategoryDialog(category, subcategories),
+      );
+
+      // Navigate to the filtered events page with the selected subcategory
+      if (selectedSubcategory != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventsPage(
+                category: category, subcategory: selectedSubcategory),
+          ),
+        );
+      }
+    } else {
+      // If it doesn't have subcategories, directly navigate to the filtered events page
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EventsPage(
+            category: category,
+          ),
+        ),
+      );
+    }
+  }
+
+  final Map<String, List<String>> _categoriesAndSubcategories = {
+    'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
+    'Sports': [],
+    'Cultural': [],
+    'Tech': ['Hackathon', 'Coding Competition', 'Webinar', 'Workshop'],
+    'Arts & Entertainment': ['Music', 'Dance', 'Drama', 'Film'],
+    'Business & Career': ['Networking', 'Job Fair', 'Startup Pitch'],
+    'Health & Wellness': ['Yoga', 'Meditation', 'Fitness'],
+    'Others': ['Social', 'Party', 'Festival'],
+  };
+
+  Dialog _buildSubcategoryDialog(String category, List<String> subcategories) {
+  return Dialog(
+    backgroundColor: Colors.transparent, // Transparent background
+    insetPadding: const EdgeInsets.all(20), // Adjust padding from edges of the screen
+    child: Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: backgndColor,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$category :',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.maxFinite,
+            child: GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: subcategories
+                  .map((subcategory) =>
+                      _buildSubcategoryGridItem(category, subcategory))
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+  
+  Widget _buildSubcategoryGridItem(String category, String subcategory) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventsPage(
+              category: category,
+              subcategory: subcategory,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          image: DecorationImage(
+            image: NetworkImage(
+              _getBackgroundImageForSubcategory(category, subcategory),
+            ), // Background image for subcategory
+            fit: BoxFit.cover,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            subcategory,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class CategoryGridItem extends StatelessWidget {
   final String category;
-  final String backgroundImage; // Added backgroundImage property
+  final String backgroundImage;
   final Color textColor;
   final VoidCallback onTap;
   final bool isSelected;
@@ -131,5 +259,27 @@ String _getBackgroundImageForCategory(String category) {
     // ... Add more cases for other categories
     default:
       return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30'; // Default image URL
+  }
+}
+
+String _getBackgroundImageForSubcategory(String category, String subcategory) {
+  switch (category) {
+    case 'Education':
+      switch (subcategory) {
+        case 'Workshop':
+          return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Example image path for Education Workshop
+        case 'Seminar':
+          return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40';
+        // ... add more cases for other subcategories under Education
+        default:
+          return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Default for Education category
+      }
+    case 'Sports':
+      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Since Sports has no subcategories, return the default
+    case 'Cultural':
+      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40';
+    // ... add cases for other categories and their subcategories
+    default:
+      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Overall default image
   }
 }

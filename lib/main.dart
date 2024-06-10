@@ -1,4 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cu_events/controller/auth_service.dart';
 import 'package:cu_events/view/admin/admin_Panel/add_events.dart';
 import 'package:cu_events/view/admin/admin_login_screen.dart';
 import 'package:cu_events/view/admin/admin_panel.dart';
@@ -11,10 +12,14 @@ import 'package:cu_events/view/events/events_details.dart';
 import 'package:cu_events/firebase_options.dart';
 import 'package:cu_events/view/home/homepage.dart';
 import 'package:cu_events/controller/notification.dart';
+import 'package:cu_events/view/login/create_account.dart';
+import 'package:cu_events/view/login/forget_password.dart';
+import 'package:cu_events/view/login/login_screen.dart';
 import 'package:cu_events/view/splashscreen/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
@@ -43,7 +48,12 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(MyApp());
+    runApp(
+      Provider(
+        create: (context) => AuthService(),
+        child: const MyApp(),
+      ),
+    );
   });
 }
 
@@ -76,30 +86,30 @@ class MyApp extends StatelessWidget {
           headlineLarge: TextStyle(
             fontSize: 34,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Acme',
+            fontFamily: 'Montserrat',
             color: whiteColor,
           ),
           headlineMedium: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Acme',
+            fontFamily: 'Montserrat',
             color: textColor,
           ),
           bodyLarge: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Acme',
+            fontFamily: 'Montserrat',
             color: textColor,
           ),
           bodyMedium: TextStyle(
             fontSize: 18,
-            fontFamily: 'Acme',
+            fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
             color: textColor,
           ),
           bodySmall: TextStyle(
             fontSize: 18,
-            fontFamily: 'Acme',
+            fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
             color: whiteColor,
           ),
@@ -107,25 +117,17 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: primaryBckgnd,
           iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle:  TextStyle(
-              fontSize: 34,
-              color: whiteColor,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Acme',
-            ),
-          // GoogleFonts.montserrat(
-          //   textStyle: TextStyle(
-          //     fontSize: 34,
-          //     color: whiteColor,
-          //     fontWeight: FontWeight.bold,
-          //     fontFamily: 'Acme',
-          //   ),
-          // ),
+          titleTextStyle: TextStyle(
+            fontSize: 34,
+            color: whiteColor,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Montserrat',
+          ),
         ),
         colorScheme: ColorScheme.fromSeed(seedColor: primaryBckgnd),
       ),
       initialRoute: '/',
-      home: SplashScreen(),
+      home: const SplashScreen(),
       routes: {
         '/home': (context) => const Homepage(),
         '/admin': (context) => const AdminPanel(),
@@ -136,6 +138,9 @@ class MyApp extends StatelessWidget {
         '/feedback': (context) => const FeedbackPage(),
         '/aboutus': (context) => const AboutUsPage(),
         '/category': (context) => const CategoriesPage(),
+        '/login': (context) => const LoginScreen(),
+        '/create': (context) => const CreateAccountPage(),
+        '/forgetpassword': (context) => const ForgotPasswordPage(),
       },
     );
   }

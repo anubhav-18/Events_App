@@ -1,7 +1,8 @@
 import 'package:cu_events/reusable_widget/custom_button.dart';
+import 'package:cu_events/reusable_widget/custom_textfiled.dart';
+import 'package:cu_events/reusable_widget/custome_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:cu_events/firestore_service.dart';
+import 'package:cu_events/controller/firestore_service.dart';
 import 'package:cu_events/reusable_widget/custom_snackbar.dart';
 
 class FeedbackPage extends StatefulWidget {
@@ -32,117 +33,133 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Feedback',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(hintText: 'Your Name'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(hintText: 'Your Email'),
-                  // You can add email validation if needed
-                ),
-                const SizedBox(height: 20),
-                // Feedback Category Dropdown
-                DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  items: _feedbackCategories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value!;
-                    });
-                  },
-                  decoration: const InputDecoration(labelText: 'Category'),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _feedbackController,
-                  maxLines: 10,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter your feedback here...',
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      CustomTextField(
+                        labelText: 'Name',
+                        controller: _nameController,
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextField(
+                        labelText: 'Email',
+                        controller: _emailController,
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 20),
+                      // Feedback Category Dropdown
+                      CustomDropdown(
+                        labelText: 'Category',
+                        value: _selectedCategory,
+                        items: _feedbackCategories.map((category) {
+                          return DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value!;
+                          });
+                        },
+                      ),
+                      // DropdownButtonFormField<String>(
+                      //   value: _selectedCategory,
+                      //   items: _feedbackCategories.map((category) {
+                      //     return DropdownMenuItem(
+                      //       value: category,
+                      //       child: Text(category),
+                      //     );
+                      //   }).toList(),
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       _selectedCategory = value!;
+                      //     });
+                      //   },
+                      //   decoration:
+                      //       const InputDecoration(labelText: 'Category'),
+                      // ),
+                      const SizedBox(height: 20),
+                      CustomTextField(
+                        labelText: 'Feedback',
+                        hintText: 'Enter your feedback here...',
+                        obscureText: false,
+                        controller: _feedbackController,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        maxLength: 1000,
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your feedback';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 20),
-                Center(
-                  child: elevatedButton(
-                    context,
-                    _isSubmitting ? null : _submitFeedback,
-                    'Submit Feedback',
-                    null,
-                  ),
-                )
-              ],
+              ),
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomElevatedButton(
+              onPressed: _isSubmitting ? null : _submitFeedback,
+              title: 'Submit Feedback',
+              width: double.infinity,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Future<void> _submitFeedback() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      await _firestoreService.addFeedback(
-        _nameController.text,
-        _emailController.text,
-        _selectedCategory,
-        _feedbackController.text,
-      );
-
-      showCustomSnackBar(context, 'Thank you for your feedback!');
-
-      // Clear text fields and reset category dropdown
-      _formKey.currentState!.reset(); 
-      _nameController.clear();
-      _emailController.clear();
-      _feedbackController.clear();
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _selectedCategory = 'General'; 
+        _isSubmitting = true;
       });
-    } catch (e) {
-      showCustomSnackBar(
-          context, 'Failed to submit feedback. Please try again later.');
-      print('Error submitting feedback: $e');
-    } finally {
-      setState(() {
-        _isSubmitting = false;
-      });
+
+      try {
+        await _firestoreService.addFeedback(
+          _nameController.text,
+          _emailController.text,
+          _selectedCategory,
+          _feedbackController.text,
+        );
+
+        showCustomSnackBar(
+          context,
+          'Thank you for your feedback!',
+        );
+
+        // Clear text fields and reset category dropdown
+        _formKey.currentState!.reset();
+        _nameController.clear();
+        _emailController.clear();
+        _feedbackController.clear();
+        setState(() {
+          _selectedCategory = 'General';
+        });
+      } catch (e) {
+        showCustomSnackBar(
+          context,
+          'Failed to submit feedback. Please try again later.',
+        );
+        print('Error submitting feedback: $e');
+      } finally {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
-}
 }

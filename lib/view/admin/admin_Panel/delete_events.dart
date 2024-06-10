@@ -132,13 +132,14 @@ class _DeleteEventsPageState extends State<DeleteEventsPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              elevatedButton(
-                  context,
-                  () => _selectDeadline(context),
-                  _selectedDeadline == null
-                      ? 'Select Deadline'
-                      : DateFormat('yyyy-MM-dd').format(_selectedDeadline!),
-                  MediaQuery.of(context).size.width * 0.45),
+              CustomElevatedButton(
+                onPressed: () => _selectDeadline(context),
+                title: _selectedDeadline == null
+                    ? 'Select Deadline'
+                    : DateFormat('yyyy-MM-dd').format(_selectedDeadline!),
+                width: MediaQuery.of(context).size.width * 0.45,
+                height: null,
+              ),
               const SizedBox(height: 10),
               _filteredEvents.isEmpty
                   ? Column(
