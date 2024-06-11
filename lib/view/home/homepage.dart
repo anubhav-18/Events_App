@@ -21,7 +21,7 @@ class _HomepageState extends State<Homepage> {
   final FirestoreService _firestoreService = FirestoreService();
   List<EventModel> _popularEvents = [];
   List<EventModel> _upcomingEvents = [];
-  List<EventModel> _filteredEvents = [];
+  // List<EventModel> _filteredEvents = [];
   bool _isLoading = true;
   String? _selectedCategory;
 
@@ -46,7 +46,7 @@ class _HomepageState extends State<Homepage> {
     } finally {
       setState(() {
         _isLoading = false;
-        _filteredEvents = _upcomingEvents;
+        // _filteredEvents = _upcomingEvents;
       });
     }
   }

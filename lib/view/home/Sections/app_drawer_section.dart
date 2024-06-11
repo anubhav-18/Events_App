@@ -60,9 +60,12 @@ class AppDrawer extends StatelessWidget {
                     } else {
                       final userModel = userSnapshot.data;
                       final user = snapshot.data!;
+                      String? name = user.displayName;
+                      List<String>? nameParts = name?.split(" ");
+                      String? firstName = nameParts!.isNotEmpty ? nameParts.first : '';
                       return _buildDrawerHeaderLoggedIN(
                         context,
-                        userModel?.firstName ?? user.displayName ?? 'User',
+                        userModel?.firstName ?? firstName,
                         userModel?.email ?? user.email ?? '',
                       );
                     }

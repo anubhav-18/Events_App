@@ -39,8 +39,7 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
                 children: _categoriesAndSubcategories.keys.map((category) {
                   return CategoryGridItem(
                     category: category,
-                    backgroundImage: _getBackgroundImageForCategory(category),
-                    textColor: textColor,
+                    textColor: whiteColor,
                     isSelected: category == widget.selectedCategory,
                     onTap: () => _onCategorySelected(category, context),
                   );
@@ -111,50 +110,51 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
     'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
     'Sports': [],
     'Cultural': [],
-    'Tech': ['Hackathon', 'Coding Competition', 'Webinar', 'Workshop'],
-    'Arts & Entertainment': ['Music', 'Dance', 'Drama', 'Film'],
+    'Tech': ['Hackathon', 'Coding Rounds', 'Workshop'],
+    'Arts & Entertainment': ['Music & Dance', 'Drama & Film'],
     'Business & Career': ['Networking', 'Job Fair', 'Startup Pitch'],
-    'Health & Wellness': ['Yoga', 'Meditation', 'Fitness'],
+    'Health & Wellness': ['Meditation & Yoga', 'Fitness'],
     'Others': ['Social', 'Party', 'Festival'],
   };
 
   Dialog _buildSubcategoryDialog(String category, List<String> subcategories) {
-  return Dialog(
-    backgroundColor: Colors.transparent, // Transparent background
-    insetPadding: const EdgeInsets.all(20), // Adjust padding from edges of the screen
-    child: Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: backgndColor,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$category :',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.maxFinite,
-            child: GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: subcategories
-                  .map((subcategory) =>
-                      _buildSubcategoryGridItem(category, subcategory))
-                  .toList(),
+    return Dialog(
+      backgroundColor: Colors.transparent, // Transparent background
+      insetPadding:
+          const EdgeInsets.all(20), // Adjust padding from edges of the screen
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: backgndColor,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$category :',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.maxFinite,
+              child: GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: subcategories
+                    .map((subcategory) =>
+                        _buildSubcategoryGridItem(category, subcategory))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-  
+    );
+  }
+
   Widget _buildSubcategoryGridItem(String category, String subcategory) {
     return GestureDetector(
       onTap: () {
@@ -174,9 +174,7 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           image: DecorationImage(
-            image: NetworkImage(
-              _getBackgroundImageForSubcategory(category, subcategory),
-            ), // Background image for subcategory
+            image: _getBackgroundImageForSubcategory(category, subcategory),
             fit: BoxFit.cover,
           ),
           boxShadow: [
@@ -188,12 +186,27 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            subcategory,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                subcategory,
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: whiteColor),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -202,7 +215,6 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
 
 class CategoryGridItem extends StatelessWidget {
   final String category;
-  final String backgroundImage;
   final Color textColor;
   final VoidCallback onTap;
   final bool isSelected;
@@ -210,7 +222,6 @@ class CategoryGridItem extends StatelessWidget {
   const CategoryGridItem({
     Key? key,
     required this.category,
-    required this.backgroundImage,
     required this.textColor,
     required this.onTap,
     this.isSelected = false,
@@ -225,7 +236,7 @@ class CategoryGridItem extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           image: DecorationImage(
-            image: NetworkImage(backgroundImage), // Load image from URL
+            image: _getBackgroundImageForCategory(category),
             fit: BoxFit.cover,
           ),
           boxShadow: [
@@ -238,48 +249,145 @@ class CategoryGridItem extends StatelessWidget {
           ],
           border: isSelected ? Border.all(color: Colors.blue, width: 2) : null,
         ),
-        child: Center(
-          child: Text(category,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                category,
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: whiteColor),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-String _getBackgroundImageForCategory(String category) {
+AssetImage _getBackgroundImageForCategory(String category) {
   switch (category) {
     case 'Education':
-      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Example image URL
+      return const AssetImage('assets/images/CategoryImages/education.jpg');
     case 'Sports':
-      return 'https://images.unsplash.com/photo-1517649763962-0c623066013b';
+      return const AssetImage('assets/images/CategoryImages/sports.jpg');
     case 'Cultural':
-      return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e';
-    // ... Add more cases for other categories
+      return const AssetImage('assets/images/CategoryImages/cultural.jpg');
+    case 'Tech':
+      return const AssetImage('assets/images/CategoryImages/tech.jpg');
+    case 'Arts & Entertainment':
+      return const AssetImage('assets/images/CategoryImages/arts.jpeg');
+    case 'Business & Career':
+      return const AssetImage('assets/images/CategoryImages/business.jpg');
+    case 'Health & Wellness':
+      return const AssetImage('assets/images/CategoryImages/health.jpeg');
+    case 'Others':
+      return const AssetImage('assets/images/CategoryImages/others.jpg');
     default:
-      return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30'; // Default image URL
+      return const AssetImage('assets/images/CategoryImages/others.jpg');
   }
 }
 
-String _getBackgroundImageForSubcategory(String category, String subcategory) {
+AssetImage _getBackgroundImageForSubcategory(
+    String category, String subcategory) {
   switch (category) {
     case 'Education':
       switch (subcategory) {
         case 'Workshop':
-          return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Example image path for Education Workshop
+          return const AssetImage(
+              'assets/images/CategoryImages/EDU_workshop.jpg');
         case 'Seminar':
-          return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40';
-        // ... add more cases for other subcategories under Education
+          return const AssetImage(
+              'assets/images/CategoryImages/EDU_seminar.jpg');
+        case 'Conference':
+          return const AssetImage(
+              'assets/images/CategoryImages/EDU_conference.jpg');
+        case 'Training':
+          return const AssetImage(
+              'assets/images/CategoryImages/EDU_training.png');
         default:
-          return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Default for Education category
+          return const AssetImage(
+              'assets/images/CategoryImages/EDU_training.png');
       }
-    case 'Sports':
-      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Since Sports has no subcategories, return the default
-    case 'Cultural':
-      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40';
-    // ... add cases for other categories and their subcategories
+    case 'Tech':
+      switch (subcategory) {
+        case 'Hackathon':
+          return const AssetImage(
+              'assets/images/CategoryImages/TECH_hackathon.png');
+        case 'Coding Rounds':
+          return const AssetImage(
+              'assets/images/CategoryImages/TECH_coding.jpeg');
+        case 'Workshop':
+          return const AssetImage(
+              'assets/images/CategoryImages/TECH_workshop.jpg');
+        default:
+          return const AssetImage(
+              'assets/images/CategoryImages/TECH_workshop.jpg');
+      }
+    case 'Arts & Entertainment':
+      switch (subcategory) {
+        case 'Music & Dance':
+          return const AssetImage('assets/images/CategoryImages/A_Edance.png');
+        case 'Drama & Film':
+          return const AssetImage('assets/images/CategoryImages/A_Efilm.jpg');
+        default:
+          return const AssetImage('assets/images/CategoryImages/A_Edance.png');
+      }
+    case 'Business & Career':
+      switch (subcategory) {
+        case 'Networking':
+          return const AssetImage(
+              'assets/images/CategoryImages/B_Cnetworking.png');
+        case 'Job Fair':
+          return const AssetImage(
+              'assets/images/CategoryImages/B_Cjob fair.jpg');
+        case 'Startup Pitch':
+          return const AssetImage(
+              'assets/images/CategoryImages/B_Cstartup pitch.jpg');
+        default:
+          return const AssetImage(
+              'assets/images/CategoryImages/B_Cstartup pitch.jpg');
+      }
+    case 'Health & Wellness':
+      switch (subcategory) {
+        case 'Meditation & Yoga':
+          return const AssetImage(
+              'assets/images/CategoryImages/H_F_meditation.png');
+        case 'Fitness':
+          return const AssetImage(
+              'assets/images/CategoryImages/H_F_fitness.jpg');
+        default:
+          return const AssetImage(
+              'assets/images/CategoryImages/H_F_meditation.png');
+      }
+    case 'Others':
+      switch (subcategory) {
+        case 'Social':
+          return const AssetImage(
+              'assets/images/CategoryImages/OTHERS_social.jpg');
+        case 'Party':
+          return const AssetImage(
+              'assets/images/CategoryImages/OTHERS_Party.png');
+        case 'Festival':
+          return const AssetImage(
+              'assets/images/CategoryImages/OTHERS_festival.jpg');
+        default:
+          return const AssetImage(
+              'assets/images/CategoryImages/OTHERS_festival.jpg');
+      }
     default:
-      return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40'; // Overall default image
+      return const AssetImage(
+          'assets/images/CategoryImages/OTHERS_festival.jpg');
   }
 }
