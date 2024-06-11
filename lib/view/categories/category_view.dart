@@ -1,3 +1,4 @@
+import 'package:cu_events/controller/category_data.dart';
 import 'package:cu_events/controller/firestore_service.dart';
 import 'package:cu_events/view/events/events_page.dart';
 import 'package:flutter/material.dart';
@@ -15,27 +16,19 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage> {
   final FirestoreService _firestoreService = FirestoreService();
-  final Map<String, List<String>> _categoriesAndSubcategories = {
-    'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
-    'Sports': [],
-    'Cultural': [],
-    'Tech': ['Hackathon', 'Coding Competition', 'Webinar', 'Workshop'],
-    'Arts & Entertainment': ['Music', 'Dance', 'Drama', 'Film'],
-    'Business & Career': ['Networking', 'Job Fair', 'Startup Pitch'],
-    'Health & Wellness': ['Yoga', 'Meditation', 'Fitness'],
-    'Others': ['Social', 'Party', 'Festival'],
-  };
+  final Map<String, List<String>> _categoriesAndSubcategories =
+      CategoryData.categoriesAndSubcategories;
+
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchAllEvents(); 
+    _fetchAllEvents();
   }
 
   Future<void> _fetchAllEvents() async {
-    try {
-    } catch (e) {
+    try {} catch (e) {
       print('Error fetching events: $e');
     } finally {
       setState(() {
@@ -153,11 +146,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
         ),
       ),
       leading: _getIconForCategory(category),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        color: primaryBckgnd,
-        size: 17,
-      ),
       onTap: () {
         // ... (your navigation logic for non-expandable tile)
         Navigator.push(

@@ -59,40 +59,6 @@ class FirestoreService {
         .toList();
   }
 
-  // Add Event
-  Future<void> addEvent(EventModel event) async {
-    try {
-      await _db.collection('events').add(event.toFirestore());
-    } catch (e) {
-      // Handle errors (show error message, log, etc.)
-      print('Error adding event: $e');
-      throw e; // Re-throw the error to be handled in the UI
-    }
-  }
-
-  // Update Event
-  Future<void> updateEvent(EventModel event) async {
-    try {
-      await _db
-          .collection('events')
-          .doc(event.id) // Assuming you have the event ID
-          .update(event.toFirestore());
-    } catch (e) {
-      print('Error updating event: $e');
-      throw e;
-    }
-  }
-
-  // Delete Event
-  Future<void> deleteEvent(String eventId) async {
-    try {
-      await _db.collection('events').doc(eventId).delete();
-    } catch (e) {
-      print('Error deleting event: $e');
-      throw e;
-    }
-  }
-
   // Feedback
   Future<void> addFeedback(
       String name, String? email, String category, String feedback) async {
@@ -141,5 +107,61 @@ class FirestoreService {
       print('Error getting user details: $e');
       return null;
     }
+  }
+
+  // Search Function by title
+  Future<List<EventModel>> searchEvents(String query) async {
+    QuerySnapshot snapshot = await _db
+        .collection('events')
+        .where('titleLowercase', isGreaterThanOrEqualTo: query.toLowerCase())
+        .where('titleLowercase',
+            isLessThanOrEqualTo: '${query.toLowerCase()}\uf8ff')
+        .get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  // Search By category and subcategory
+  Future<List<EventModel>> searchEventsByCategoryOrSubcategory(
+      String query) async {
+    QuerySnapshot snapshot = await _db
+        .collection('events')
+        .where(
+          'categoryLowercase', // Ensure you have a lowercase version of category for case-insensitive search
+          isEqualTo: query.toLowerCase(),
+        )
+        .get();
+
+    List<EventModel> results = snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+
+    // Search for events matching subcategory if no results found for category
+    if (results.isEmpty) {
+      snapshot = await _db
+          .collection('events')
+          .where(
+            'subcategoryLowercase', // Ensure you have a lowercase version of subcategory for case-insensitive search
+            isEqualTo: query.toLowerCase(),
+          )
+          .get();
+
+      results = snapshot.docs
+          .map((doc) => EventModel.fromFirestore(
+              doc.data() as Map<String, dynamic>, doc.id))
+          .toList();
+    }
+
+    return results;
+  }
+
+  // Trending Search
+  Future<List<String>> getTrendingSearches() async {
+    return Future.delayed(const Duration(seconds: 1),
+        () => ['Coding', 'Seminar', 'Workshop', 'Hackathon']);
   }
 }

@@ -1,8 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cu_events/controller/auth_service.dart';
-import 'package:cu_events/view/admin/admin_Panel/add_events.dart';
-import 'package:cu_events/view/admin/admin_login_screen.dart';
-import 'package:cu_events/view/admin/admin_panel.dart';
 import 'package:cu_events/constants.dart';
 import 'package:cu_events/view/categories/category_view.dart';
 import 'package:cu_events/view/drawer/about_us.dart';
@@ -116,7 +113,7 @@ class MyApp extends StatelessWidget {
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: primaryBckgnd,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Colors.white,size: 30),
           titleTextStyle: TextStyle(
             fontSize: 34,
             color: whiteColor,
@@ -130,10 +127,7 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         '/home': (context) => const Homepage(),
-        '/admin': (context) => const AdminPanel(),
         '/event_details': (context) => const EventDetailsPage(),
-        '/secret-admin-login': (context) => const AdminLoginScreen(),
-        '/addEvents': (context) => const AddEventsPanel(),
         '/allevents': (context) => const AllEventsPage(),
         '/feedback': (context) => const FeedbackPage(),
         '/aboutus': (context) => const AboutUsPage(),

@@ -3,10 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class EventModel {
   final String id;
   final String title;
+  final String titleLowercase;
   final String description;
   final String imageUrl;
   final String category;
   final String subcategory;
+  final String categoryLowercase;
+  final String subcategoryLowercase;
   final String link;
   final DateTime? deadline;
   final bool popular;
@@ -27,16 +30,25 @@ class EventModel {
     required this.startdate,
     required this.enddate,
     required this.location,
-  });
+    String? titleLowercase,
+    String? categoryLowercase,
+    String? subcategoryLowercase,
+  })  : titleLowercase = titleLowercase ?? title.toLowerCase(),
+        categoryLowercase = categoryLowercase ?? category.toLowerCase(),
+        subcategoryLowercase =
+            subcategoryLowercase ?? subcategory.toLowerCase();
 
   factory EventModel.fromFirestore(Map<String, dynamic> data, String id) {
     return EventModel(
       id: id,
       title: data['title'] ?? '',
+      titleLowercase: (data['title'] ?? '').toLowerCase(),
       description: data['description'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       category: data['category'] ?? '',
       subcategory: data['subcategory'] ?? '',
+      categoryLowercase: (data['category'] ?? '').toLowerCase(),
+      subcategoryLowercase: (data['subcategory'] ?? '').toLowerCase(),
       link: data['link'] ?? '',
       deadline: data['deadline'] != null
           ? (data['deadline'] is Timestamp
@@ -61,10 +73,13 @@ class EventModel {
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
+      'title_lowercase': titleLowercase,
       'description': description,
       'imageUrl': imageUrl,
       'category': category,
       'subcategory': subcategory,
+      'categoryLowercase': categoryLowercase,
+      'subcategoryLowercase': subcategoryLowercase,
       'link': link,
       'deadline': deadline,
       'popular': popular,

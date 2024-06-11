@@ -5,8 +5,10 @@ import 'package:cu_events/models/event_model.dart';
 import 'package:cu_events/view/home/Sections/app_drawer_section.dart';
 import 'package:cu_events/view/home/Sections/categories_section.dart';
 import 'package:cu_events/view/home/Sections/popular_event_section.dart';
+import 'package:cu_events/view/home/Sections/search_view.dart';
 import 'package:cu_events/view/home/Sections/upcoming_event_section.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -46,7 +48,6 @@ class _HomepageState extends State<Homepage> {
     } finally {
       setState(() {
         _isLoading = false;
-        // _filteredEvents = _upcomingEvents;
       });
     }
   }
@@ -61,15 +62,45 @@ class _HomepageState extends State<Homepage> {
           'CU EVENTS',
         ),
         actions: [
-          GestureDetector(
-            onDoubleTap: _incrementTap,
-            child: const SizedBox(
-              width: 50,
-              height: 50,
-              child: Icon(Icons.settings,
-                  color: Colors.transparent), // Invisible icon
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/search.svg',
+              colorFilter: const ColorFilter.mode(
+                whiteColor,
+                BlendMode.srcIn,
+              ),
             ),
+            onPressed: () {
+              Navigator.of(context).push(PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const SearchPage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 1.0); // Start from bottom
+                  const end = Offset.zero; // End at top
+                  const curve = Curves.easeInOut; // Animation curve
+
+                  var tween = Tween(begin: begin, end: end).chain(
+                    CurveTween(curve: curve),
+                  );
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ));
+            },
           ),
+          // GestureDetector(
+          //   onDoubleTap: _incrementTap,
+          //   child: const SizedBox(
+          //     width: 50,
+          //     height: 50,
+          //     child: Icon(Icons.settings,
+          //         color: Colors.transparent), // Invisible icon
+          //   ),
+          // ),
         ],
         centerTitle: true,
         elevation: 8,

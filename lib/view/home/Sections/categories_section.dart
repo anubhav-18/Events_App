@@ -1,3 +1,4 @@
+import 'package:cu_events/controller/category_data.dart';
 import 'package:cu_events/view/events/events_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/constants.dart';
@@ -18,6 +19,8 @@ class EventCategorySelector extends StatefulWidget {
 }
 
 class _EventCategorySelectorState extends State<EventCategorySelector> {
+  final Map<String, List<String>> _categoriesAndSubcategories =
+      CategoryData.categoriesAndSubcategories;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -105,17 +108,6 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
       );
     }
   }
-
-  final Map<String, List<String>> _categoriesAndSubcategories = {
-    'Education': ['Workshop', 'Seminar', 'Conference', 'Training'],
-    'Sports': [],
-    'Cultural': [],
-    'Tech': ['Hackathon', 'Coding Rounds', 'Workshop'],
-    'Arts & Entertainment': ['Music & Dance', 'Drama & Film'],
-    'Business & Career': ['Networking', 'Job Fair', 'Startup Pitch'],
-    'Health & Wellness': ['Meditation & Yoga', 'Fitness'],
-    'Others': ['Social', 'Party', 'Festival'],
-  };
 
   Dialog _buildSubcategoryDialog(String category, List<String> subcategories) {
     return Dialog(
@@ -282,17 +274,13 @@ AssetImage _getBackgroundImageForCategory(String category) {
       return const AssetImage('assets/images/CategoryImages/education.jpg');
     case 'Sports':
       return const AssetImage('assets/images/CategoryImages/sports.jpg');
-    case 'Cultural':
-      return const AssetImage('assets/images/CategoryImages/cultural.jpg');
-    case 'Tech':
-      return const AssetImage('assets/images/CategoryImages/tech.jpg');
     case 'Arts & Entertainment':
       return const AssetImage('assets/images/CategoryImages/arts.jpeg');
     case 'Business & Career':
       return const AssetImage('assets/images/CategoryImages/business.jpg');
     case 'Health & Wellness':
       return const AssetImage('assets/images/CategoryImages/health.jpeg');
-    case 'Others':
+    case 'Fests':
       return const AssetImage('assets/images/CategoryImages/others.jpg');
     default:
       return const AssetImage('assets/images/CategoryImages/others.jpg');
@@ -310,30 +298,15 @@ AssetImage _getBackgroundImageForSubcategory(
         case 'Seminar':
           return const AssetImage(
               'assets/images/CategoryImages/EDU_seminar.jpg');
-        case 'Conference':
-          return const AssetImage(
-              'assets/images/CategoryImages/EDU_conference.jpg');
-        case 'Training':
-          return const AssetImage(
-              'assets/images/CategoryImages/EDU_training.png');
-        default:
-          return const AssetImage(
-              'assets/images/CategoryImages/EDU_training.png');
-      }
-    case 'Tech':
-      switch (subcategory) {
         case 'Hackathon':
           return const AssetImage(
               'assets/images/CategoryImages/TECH_hackathon.png');
         case 'Coding Rounds':
           return const AssetImage(
-              'assets/images/CategoryImages/TECH_coding.jpeg');
-        case 'Workshop':
-          return const AssetImage(
-              'assets/images/CategoryImages/TECH_workshop.jpg');
+              'assets/images/CategoryImages/tech.jpg');
         default:
           return const AssetImage(
-              'assets/images/CategoryImages/TECH_workshop.jpg');
+              'assets/images/CategoryImages/EDU_training.png');
       }
     case 'Arts & Entertainment':
       switch (subcategory) {
@@ -371,7 +344,7 @@ AssetImage _getBackgroundImageForSubcategory(
           return const AssetImage(
               'assets/images/CategoryImages/H_F_meditation.png');
       }
-    case 'Others':
+    case 'Fests':
       switch (subcategory) {
         case 'Social':
           return const AssetImage(
@@ -382,6 +355,8 @@ AssetImage _getBackgroundImageForSubcategory(
         case 'Festival':
           return const AssetImage(
               'assets/images/CategoryImages/OTHERS_festival.jpg');
+        case 'Cultural':
+          return const AssetImage('assets/images/CategoryImages/cultural.jpg');
         default:
           return const AssetImage(
               'assets/images/CategoryImages/OTHERS_festival.jpg');

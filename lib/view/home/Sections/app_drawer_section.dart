@@ -62,7 +62,10 @@ class AppDrawer extends StatelessWidget {
                       final user = snapshot.data!;
                       String? name = user.displayName;
                       List<String>? nameParts = name?.split(" ");
-                      String? firstName = nameParts!.isNotEmpty ? nameParts.first : '';
+                      String firstName =
+                          (nameParts != null && nameParts.isNotEmpty)
+                              ? nameParts.first
+                              : 'User';
                       return _buildDrawerHeaderLoggedIN(
                         context,
                         userModel?.firstName ?? firstName,
@@ -181,6 +184,7 @@ class AppDrawer extends StatelessWidget {
   Widget _buildDrawerHeaderLoggedIN(
       BuildContext context, String name, String email) {
     return Container(
+      padding: const EdgeInsets.only(top: 10,bottom: 5,left: 10,right: 10),
       height: 180,
       color: primaryBckgnd,
       child: Stack(
@@ -203,6 +207,8 @@ class AppDrawer extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   'Hey, $name',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.montserrat(
                     textStyle:
                         Theme.of(context).textTheme.headlineMedium!.copyWith(
@@ -212,7 +218,9 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '$email',
+                  email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.montserrat(
                     textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Colors.white,
