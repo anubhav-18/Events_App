@@ -36,11 +36,6 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
         const SizedBox(height: 10),
         widget.isLoading
             ? _buildShimmerPlaceholder()
-            // const Center(
-            //     child: SpinKitChasingDots(
-            //       color: textColor,
-            //     ),
-            //   )
             : widget.popularEvents.isNotEmpty
                 ? CarouselSlider(
                     items: widget.popularEvents.map((event) {
@@ -143,7 +138,7 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
                     Text(
                       event.title,
                       style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: Colors.white,
                               ),
                     ),

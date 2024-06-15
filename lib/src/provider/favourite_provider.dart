@@ -11,10 +11,23 @@ class FavoriteProvider extends ChangeNotifier {
   List<String> _favoriteEventIds = [];
   bool _isLoading = true;
 
+  // FavoriteProvider() {
+  //   _firestore = FirebaseFirestore.instance;
+  //   _user = FirebaseAuth.instance.currentUser!;
+  //   _loadFavorites();
+  // }
+
   FavoriteProvider() {
-    _firestore = FirebaseFirestore.instance;
-    _user = FirebaseAuth.instance.currentUser!;
-    _loadFavorites();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        // User logged out, clear favorites
+        _favoriteEventIds.clear();
+      } else {
+        _user = user;
+        _loadFavorites();
+      }
+      notifyListeners();
+    });
   }
 
   List<String> get favoriteEventIds => _favoriteEventIds;

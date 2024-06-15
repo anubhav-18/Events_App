@@ -29,7 +29,7 @@ class CustomDropdown extends StatelessWidget {
             alignedDropdown: true,
             child: DropdownButtonFormField<String>(
               value: value,
-              items: items,
+              items: items,              
               dropdownColor: whiteColor,
               onChanged: onChanged,
               validator: validator,

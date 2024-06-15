@@ -142,36 +142,34 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           // If location is found, use it for TZDateTime conversion
           if (location != null) {
             final Event calendarEvent = Event(
-              title: event.title,
-              description: event.description,
-              location: event.location,
-              startDate: tz.TZDateTime.from(event.startdate!, location),
-              endDate: event.deadline != null
-                  ? tz.TZDateTime.from(event.deadline!, location)
-                  : tz.TZDateTime.from(event.enddate!, location),
-              // iosParams: IOSParams(
-              //   reminder: const Duration(hours: 1),
-              // ),
-            );
+                title: event.title,
+                description: event.description,
+                location: event.location,
+                startDate: tz.TZDateTime.from(event.startdate!, location),
+                endDate: tz.TZDateTime.from(event.enddate!, location));
 
             final result = await Add2Calendar.addEvent2Cal(calendarEvent);
 
             if (result) {
               showCustomSnackBar(context, 'Event added to calendar!');
             } else {
-              showCustomSnackBar(context, 'Failed to add event to calendar!');
+              showCustomSnackBar(context, 'Failed to add event to calendar!',
+                  isError: true);
             }
           } else {
             showCustomSnackBar(
-                context, 'Could not determine your timezone. Event not added.');
+                context, 'Could not determine your timezone. Event not added.',
+                isError: true);
           }
         } catch (e) {
-          showCustomSnackBar(context, 'Error adding event to calendar');
+          showCustomSnackBar(context, 'Error adding event to calendar',
+              isError: true);
           print('Error adding event to calendar: $e');
         }
       } else {
         // Handle the case where permission is denied
-        showCustomSnackBar(context, "Please grant calendar permission.");
+        showCustomSnackBar(context, "Please grant calendar permission.",
+            isError: true);
       }
     }
 
@@ -291,7 +289,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                     leading: IconButton(
                       icon: const Icon(
                         Icons.arrow_back,
-                        color: primaryBckgnd,
+                        color: whiteColor,
                         size: 32,
                       ),
                       onPressed: () => Navigator.of(context).pop(),
@@ -304,20 +302,28 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             curve: Curves.easeOut,
                           ),
                         ),
-                        child: IconButton(
-                          onPressed: () {
-                            if (user != null) {
-                              favoriteProvider.toggleFavorite(event.id);
-                            } else {
-                              showCustomSnackBar(
-                                  context, 'Please Login, To use this feature',
-                                  isError: true);
-                            }
-                          },
-                          iconSize: 32,
-                          icon: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: isFavorite ? Colors.red : Colors.white,
+                        child: CircleAvatar(
+                          radius: 23,
+                          backgroundColor: greyColor.withOpacity(0.4),
+                          child: Center(
+                            child: IconButton(
+                              onPressed: () {
+                                if (user != null) {
+                                  favoriteProvider.toggleFavorite(event.id);
+                                } else {
+                                  showCustomSnackBar(context,
+                                      'Please Login, To use this feature',
+                                      isError: true);
+                                }
+                              },
+                              iconSize: 30,
+                              icon: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isFavorite ? Colors.red : Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),

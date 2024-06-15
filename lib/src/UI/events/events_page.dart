@@ -84,7 +84,9 @@ class _EventsPageState extends State<EventsPage>
       backgroundColor: greyColor,
       appBar: AppBar(
         title: Text(
-          '${widget.subcategory != null ? toBeginningOfSentenceCase(widget.subcategory!) : toBeginningOfSentenceCase(widget.category)} Events',
+          widget.subcategory != null
+              ? toBeginningOfSentenceCase(widget.subcategory!)
+              : toBeginningOfSentenceCase(widget.category),
         ),
       ),
       body: SafeArea(
@@ -266,156 +268,6 @@ class _EventsPageState extends State<EventsPage>
     );
   }
 }
-
-//   Widget _buildEventCard(EventModel event, double width, double height) {
-//     final cardHeight = height * 0.3;
-//     final cardWidth = width;
-
-//     return GestureDetector(
-//       onTap: () {
-//         Navigator.pushNamed(context, '/event_details', arguments: event);
-//       },
-//       child: Container(
-//         margin: width > 600 ? AppMargins.large : AppMargins.medium,
-//         height: cardHeight,
-//         width: cardWidth,
-//         child: ClipRRect(
-//           borderRadius: const BorderRadius.only(
-//             topLeft: Radius.circular(10),
-//             bottomLeft: Radius.circular(10),
-//           ),
-//           child: Card(
-//             color: whiteColor,
-//             margin: EdgeInsets.zero,
-//             elevation: 2,
-//             child: Stack(
-//               children: [
-//                 Row(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     ClipRRect(
-//                       borderRadius: const BorderRadius.only(
-//                         topLeft: Radius.circular(10),
-//                         bottomLeft: Radius.circular(10),
-//                       ),
-//                       child: SizedBox(
-//                         height: cardHeight,
-//                         width: cardWidth * 0.45,
-//                         child: Stack(
-//                           children: [
-//                             CachedImage(
-//                               imageUrl: event.imageUrl,
-//                               height: cardHeight,
-//                               width: cardWidth * 0.45,
-//                               boxFit: BoxFit.fill,
-//                             ),
-//                             Positioned.fill(
-//                               child: Container(
-//                                 decoration: BoxDecoration(
-//                                   color: Colors.black.withOpacity(0.35),
-//                                   borderRadius: BorderRadius.circular(10),
-//                                 ),
-//                               ),
-//                             ),
-//                             Positioned(
-//                               top: 0,
-//                               right: 0,
-//                               child: Consumer<AuthService>(
-//                                 builder: (context, authService, child) {
-//                                   final isLoggedIn = authService.loggedIn;
-//                                   final userId = authService.currentUser?.uid;
-//                                   print('Is logged in: $isLoggedIn'); // Debug statement
-//                                   return Consumer<WishlistModel>(
-//                                     builder: (context, wishlistModel, child) {
-//                                       bool isLiked = wishlistModel.isEventInWishlist(event.id);
-//                                       print('Is event in wishlist: $isLiked'); // Debug statement
-//                                       return IconButton(
-//                                         icon: Icon(
-//                                           isLiked ? Icons.favorite : Icons.favorite_border,
-//                                           color: isLiked ? Colors.red : whiteColor,
-//                                           size: 26,
-//                                         ),
-//                                         onPressed: () async {
-//                                           if (isLoggedIn) {
-//                                             if (isLiked) {
-//                                               await wishlistModel.removeEventFromWishlist(event.id,userId!);
-//                                             } else {
-//                                               await wishlistModel.addEventToWishlist(event.id,userId!);
-//                                             }
-//                                             setState(() {}); // Force widget to rebuild
-//                                           } else {
-//                                             showCustomSnackBar(
-//                                               context,
-//                                               'Please log in to use the Wishlist feature',
-//                                               isError: true,
-//                                             );
-//                                           }
-//                                         },
-//                                       );
-//                                     },
-//                                   );
-//                                 },
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                     const SizedBox(width: 10),
-//                     Expanded(
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           const SizedBox(height: 5),
-//                           Text(
-//                             event.title,
-//                             overflow: TextOverflow.ellipsis,
-//                             maxLines: 1,
-//                             style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: primaryBckgnd),
-//                           ),
-//                           Text(
-//                             event.description,
-//                             overflow: TextOverflow.ellipsis,
-//                             maxLines: 7,
-//                             style: Theme.of(context).textTheme.bodySmall,
-//                           ),
-//                           Text(
-//                             'Deadline: ${event.deadline.toString().split(' ')[0]}',
-//                             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildShimmerPlaceholder(double screenSize, double height) {
-//     return ListView.builder(
-//       itemCount: 4,
-//       itemBuilder: (context, index) => Container(
-//         margin: screenSize > 600 ? AppMargins.large : AppMargins.medium,
-//         child: Shimmer.fromColors(
-//           baseColor: Colors.grey[300]!,
-//           highlightColor: Colors.grey[100]!,
-//           child: Container(
-//             height: height * 0.4,
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(15),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class AnimatedIconButton extends StatefulWidget {
   final bool isLiked;

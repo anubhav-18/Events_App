@@ -363,15 +363,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       CustomDropdown(
                         labelText: 'Gender',
                         value: _selectedGender,
-                        items: const [
-                          DropdownMenuItem(value: 'Male', child: Text('Male')),
-                          DropdownMenuItem(
-                              value: 'Female', child: Text('Female')),
-                          DropdownMenuItem(
-                              value: 'Other', child: Text('Other')),
-                          DropdownMenuItem(
-                              value: 'Prefer not to disclose',
-                              child: Text('Prefer not to disclose')),
+                        items: [
+                          customDropdownItem('Male'),
+                          customDropdownItem('Female'),
+                          customDropdownItem('Other'),
+                          customDropdownItem('Rather not say'),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -426,4 +422,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
     );
   }
+
+  DropdownMenuItem<String> customDropdownItem(String value) => DropdownMenuItem(
+        value: value,
+        child: Text(
+          value,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(fontWeight: FontWeight.w600),
+        ),
+      );
 }

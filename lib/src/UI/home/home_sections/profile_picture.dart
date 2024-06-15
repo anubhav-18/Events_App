@@ -31,7 +31,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
     super.initState();
     _fetchUserDetails();
     _userModel = widget.updatedUser;
-
   }
 
   Future<void> _fetchUserDetails() async {
@@ -172,7 +171,13 @@ class _ProfilePictureState extends State<ProfilePicture> {
         child: CircleAvatar(
           radius: 18,
           backgroundColor: whiteColor,
-          child: SvgPicture.asset('assets/icons/profile.svg'),
+          child: SvgPicture.asset(
+            'assets/icons/profile.svg',
+            colorFilter: const ColorFilter.mode(
+              greycolor2,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
       ),
     );

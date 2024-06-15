@@ -145,10 +145,11 @@ class _AllEventsPageState extends State<AllEventsPage>
                             favoriteProvider.toggleFavorite(event.id);
                           } else {
                             showCustomSnackBar(
-                                context, 'Please Login, To use this feature',isError: true);
+                                context, 'Please Login, To use this feature',
+                                isError: true);
                           }
                         },
-                        iconSize: 32,
+                        iconSize: 30,
                         icon: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
                           color: isFavorite ? Colors.red : Colors.white,
@@ -156,7 +157,7 @@ class _AllEventsPageState extends State<AllEventsPage>
                       ),
                     ),
                   ),
-                ],      
+                ],
               ),
             ),
 
