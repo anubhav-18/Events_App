@@ -11,19 +11,28 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
+  // final ConnectivityService connectivityService = ConnectivityService();
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(); // Or a loading widget if you prefer
+          return const SizedBox.shrink(); // Or a loading widget if you prefer
         }
 
         if (snapshot.hasData) {
-          return const Homepage(); // User is logged in
+          return const Homepage();
+          // ConnectivityWrapper(
+          //   connectivityService: connectivityService,
+          //   child: const Homepage(),
+          // ); // User is logged in
         } else {
-          return const LoginScreen(); // User is not logged in
+          return const LoginScreen();
+          // ConnectivityWrapper(
+          //   connectivityService: connectivityService,
+          //   child: const LoginScreen(),
+          // ); // User is not logged in
         }
       },
     );

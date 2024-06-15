@@ -1,6 +1,6 @@
 import 'package:cu_events/src/reusable_widget/custom_button.dart';
 import 'package:cu_events/src/reusable_widget/custom_textfiled.dart';
-import 'package:cu_events/src/reusable_widget/custome_dropdown.dart';
+import 'package:cu_events/src/reusable_widget/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
@@ -26,6 +26,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     'App Features',
     'Event Suggestions',
     'Technical Issues',
+    'Contact US',
     'Other',
   ];
 
@@ -77,22 +78,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
                           });
                         },
                       ),
-                      // DropdownButtonFormField<String>(
-                      //   value: _selectedCategory,
-                      //   items: _feedbackCategories.map((category) {
-                      //     return DropdownMenuItem(
-                      //       value: category,
-                      //       child: Text(category),
-                      //     );
-                      //   }).toList(),
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _selectedCategory = value!;
-                      //     });
-                      //   },
-                      //   decoration:
-                      //       const InputDecoration(labelText: 'Category'),
-                      // ),
                       const SizedBox(height: 20),
                       CustomTextField(
                         labelText: 'Feedback',

@@ -1,5 +1,7 @@
+import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/constants.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextField extends StatefulWidget {
@@ -14,6 +16,11 @@ class CustomTextField extends StatefulWidget {
   final bool isEnabled;
   final void Function(String)? onChanged; // Add onChanged property
   final bool boolValidator;
+  final bool prefixIcon;
+  final bool isDateField;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final bool wantValidator;
 
   const CustomTextField({
     Key? key,
@@ -28,6 +35,11 @@ class CustomTextField extends StatefulWidget {
     this.maxLines,
     this.isEnabled = true,
     this.boolValidator = false,
+    this.prefixIcon = false,
+    this.isDateField = false,
+    this.readOnly = false,
+    this.wantValidator = true,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -35,23 +47,13 @@ class CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-   bool _obscureText = true;
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label Text (above)
-        Text(
-          widget.labelText,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-        const SizedBox(height: 8),
         TextFormField(
           controller: widget.controller,
           obscureText: widget.obscureText && _obscureText,
@@ -59,21 +61,58 @@ class _CustomTextFieldState extends State<CustomTextField> {
           onChanged: widget.onChanged,
           enabled: widget.isEnabled,
           maxLines: widget.obscureText ? 1 : widget.maxLines,
-          keyboardType: widget.keyboardType,
+          keyboardType: widget.isDateField
+              ? widget.prefixIcon
+                  ? TextInputType.phone
+                  : TextInputType.none
+              : widget.prefixIcon
+                  ? TextInputType.phone
+                  : widget.keyboardType,
+          readOnly: widget.readOnly,
+          onTap: widget.readOnly
+              ? widget.isDateField
+                  ? widget.onTap
+                  : () {
+                      showCustomSnackBar(context, 'Email cannot be change.');
+                    }
+              : widget.isDateField
+                  ? widget.onTap
+                  : null,
           style: GoogleFonts.montserrat(
             color: textColor,
             fontSize: 18,
           ),
           decoration: InputDecoration(
+            prefixIcon: widget.prefixIcon
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          '+91',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      const VerticalDivider(
+                        color: Colors.black,
+                        thickness: 1,
+                        width: 20,
+                      ),
+                    ],
+                  )
+                : null,
+            labelText: widget.labelText,
             hintText: widget.hintText,
-            hintStyle: GoogleFonts.montserrat(),
+            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            labelStyle: Theme.of(context).textTheme.bodyLarge,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: primaryBckgnd, width: 2.0),
+              borderSide: const BorderSide(color: greycolor2, width: 2.0),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: primaryBckgnd, width: 2.0),
+              borderSide: const BorderSide(color: greycolor2, width: 2.0),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -88,10 +127,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             suffixIcon: widget.obscureText
                 ? IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: _obscureText ? Colors.grey : primaryBckgnd, // Change color based on state
-                    ),
+                    icon: _obscureText
+                        ? SvgPicture.asset(
+                            'assets/icons/eye.svg',
+                            colorFilter: const ColorFilter.mode(
+                                Colors.grey, BlendMode.srcIn),
+                          )
+                        : SvgPicture.asset(
+                            'assets/icons/eye-slash.svg',
+                            colorFilter: const ColorFilter.mode(
+                                primaryBckgnd, BlendMode.srcIn),
+                          ),
+                    // Icon(
+                    //   _obscureText ? Icons.visibility_off : Icons.visibility,
+                    //   color: _obscureText
+                    //       ? Colors.grey
+                    //       : primaryBckgnd, // Change color based on state
+                    // ),
                     onPressed: () {
                       setState(() {
                         _obscureText = !_obscureText;
@@ -100,14 +152,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   )
                 : null,
           ),
-          validator: widget.boolValidator
-              ? widget.validator
-              : (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your ${widget.labelText}';
-                  }
-                  return null;
-                },
+          validator: widget.wantValidator
+              ? widget.boolValidator
+                  ? widget.validator
+                  : (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your ${widget.labelText}';
+                      }
+                      return null;
+                    }
+              : null,
         ),
       ],
     );

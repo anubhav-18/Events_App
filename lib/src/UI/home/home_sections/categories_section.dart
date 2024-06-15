@@ -61,7 +61,7 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
         crossAxisCount: 2,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        children: List.generate(8, (index) {
+        children: List.generate(6, (index) {
           // You can change the number of shimmer items (8 in this case)
           return Container(
             margin: const EdgeInsets.all(8),

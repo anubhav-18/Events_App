@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void showCustomSnackBar(BuildContext context, String message,
-    {bool isError = false}) {
+void showCustomSnackBar(
+  BuildContext context,
+  String message, {
+  bool isError = false,
+}) {
   final Color backgroundColor = isError ? Colors.red : primaryBckgnd;
 
   final snackBar = SnackBar(

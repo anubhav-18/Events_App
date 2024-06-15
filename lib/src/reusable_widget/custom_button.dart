@@ -77,7 +77,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton>
               style: ElevatedButton.styleFrom(
                 backgroundColor: _colorAnimation.value,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0),
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
                 elevation: 5,
               ),

@@ -1,8 +1,12 @@
+import 'package:cu_events/src/provider/favourite_provider.dart';
+import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/models/event_model.dart';
 import 'package:cu_events/src/reusable_widget/cachedImage.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import for Google Fonts
 
@@ -13,15 +17,22 @@ class AllEventsPage extends StatefulWidget {
   _AllEventsPageState createState() => _AllEventsPageState();
 }
 
-class _AllEventsPageState extends State<AllEventsPage> {
+class _AllEventsPageState extends State<AllEventsPage>
+    with SingleTickerProviderStateMixin {
   final FirestoreService _firestoreService = FirestoreService();
   List<EventModel> _allEvents = [];
   bool _isLoading = true;
+  late AnimationController _controller;
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
     _fetchAllEvents();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
   }
 
   Future<void> _fetchAllEvents() async {
@@ -35,6 +46,12 @@ class _AllEventsPageState extends State<AllEventsPage> {
         _isLoading = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -73,6 +90,9 @@ class _AllEventsPageState extends State<AllEventsPage> {
   }
 
   Widget _buildEventCard(EventModel event) {
+    final favoriteProvider = Provider.of<FavoriteProvider>(context);
+    final isFavorite = favoriteProvider.isFavorite(event.id);
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, '/event_details', arguments: event);
@@ -90,11 +110,53 @@ class _AllEventsPageState extends State<AllEventsPage> {
             ClipRRect(
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(15)),
-              child: CachedImage(
-                imageUrl: event.imageUrl,
-                height: 144, // Adjust image height as needed
-                width: double.infinity,
-                boxFit: BoxFit.cover,
+              child: Stack(
+                children: [
+                  CachedImage(
+                    imageUrl: event.imageUrl,
+                    height: 144, // Adjust image height as needed
+                    width: double.infinity,
+                    boxFit: BoxFit.cover,
+                  ),
+                  Positioned.fill(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.black45, Colors.black26],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: ScaleTransition(
+                      scale: Tween(begin: 1.0, end: 1.2).animate(
+                        CurvedAnimation(
+                          parent: _controller,
+                          curve: Curves.easeOut,
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          if (user != null) {
+                            favoriteProvider.toggleFavorite(event.id);
+                          } else {
+                            showCustomSnackBar(
+                                context, 'Please Login, To use this feature',isError: true);
+                          }
+                        },
+                        iconSize: 32,
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],      
               ),
             ),
 

@@ -5,6 +5,18 @@ import 'package:cu_events/src/models/user_model.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  Future<void> updateUserDetails(UserModel updatedUser) async {
+    try {
+      await _db
+          .collection('users')
+          .doc(updatedUser.id) // Assuming you have the user ID
+          .update(updatedUser.toMap());
+    } catch (e) {
+      print('Error updating user details: $e');
+      throw e; // Re-throw the error to be handled in the UI
+    }
+  }
+
   // All Events
   Future<List<EventModel>> getAllEvents() async {
     QuerySnapshot snapshot = await _db.collection('events').get();
@@ -94,12 +106,14 @@ class FirestoreService {
       DocumentSnapshot snapshot = await _db.collection('users').doc(uid).get();
 
       if (snapshot.exists) {
-        return UserModel(
-          id: uid,
-          firstName: snapshot.get('firstName'),
-          lastName: snapshot.get('lastName'),
-          email: snapshot.get('email'),
-        );
+        return UserModel.fromFirestore(
+            snapshot.data() as Map<String, dynamic>, snapshot.id);
+        // UserModel(
+        //   id: uid,
+        //   firstName: snapshot.get('firstName'),
+        //   lastName: snapshot.get('lastName'),
+        //   email: snapshot.get('email'),
+        // );
       } else {
         return null; // User document not found
       }
@@ -111,28 +125,29 @@ class FirestoreService {
 
   // Search Function by title
   Future<List<EventModel>> searchEvents(String query) async {
+    print("Searching events by title with query: $query");
     QuerySnapshot snapshot = await _db
         .collection('events')
-        .where('titleLowercase', isGreaterThanOrEqualTo: query.toLowerCase())
-        .where('titleLowercase',
-            isLessThanOrEqualTo: '${query.toLowerCase()}\uf8ff')
+        .where('titleLowercase', isGreaterThanOrEqualTo: query)
+        .where('titleLowercase', isLessThanOrEqualTo: '$query\uf8ff')
         .get();
 
-    return snapshot.docs
+    List<EventModel> results = snapshot.docs
         .map((doc) => EventModel.fromFirestore(
             doc.data() as Map<String, dynamic>, doc.id))
         .toList();
+    print("Found ${results.length} results by title");
+    return results;
   }
 
-  // Search By category and subcategory
   Future<List<EventModel>> searchEventsByCategoryOrSubcategory(
       String query) async {
+    print("Searching events by category with query: $query");
+
     QuerySnapshot snapshot = await _db
         .collection('events')
-        .where(
-          'categoryLowercase', // Ensure you have a lowercase version of category for case-insensitive search
-          isEqualTo: query.toLowerCase(),
-        )
+        .where('categoryLowercase', isGreaterThanOrEqualTo: query)
+        .where('categoryLowercase', isLessThanOrEqualTo: '$query\uf8ff')
         .get();
 
     List<EventModel> results = snapshot.docs
@@ -140,14 +155,12 @@ class FirestoreService {
             doc.data() as Map<String, dynamic>, doc.id))
         .toList();
 
-    // Search for events matching subcategory if no results found for category
     if (results.isEmpty) {
+      print("No results found by category, searching by subcategory");
       snapshot = await _db
           .collection('events')
-          .where(
-            'subcategoryLowercase', // Ensure you have a lowercase version of subcategory for case-insensitive search
-            isEqualTo: query.toLowerCase(),
-          )
+          .where('subcategoryLowercase', isGreaterThanOrEqualTo: query)
+          .where('subcategoryLowercase', isLessThanOrEqualTo: '$query\uf8ff')
           .get();
 
       results = snapshot.docs
@@ -156,10 +169,10 @@ class FirestoreService {
           .toList();
     }
 
+    print("Found ${results.length} results by category/subcategory");
     return results;
   }
 
-  // Trending Search
   Future<List<String>> getTrendingSearches() async {
     return Future.delayed(const Duration(seconds: 1),
         () => ['Coding', 'Seminar', 'Workshop', 'Hackathon']);

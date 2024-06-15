@@ -1,9 +1,17 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cu_events/src/UI/Menu_Items/about_us.dart';
+import 'package:cu_events/src/UI/Menu_Items/faq.dart';
+import 'package:cu_events/src/UI/Menu_Items/favourite.dart';
+import 'package:cu_events/src/UI/Menu_Items/feedback.dart';
+import 'package:cu_events/src/UI/Menu_Items/privacy_policy.dart';
+import 'package:cu_events/src/UI/Menu_Items/terms_of_service.dart';
+import 'package:cu_events/src/UI/Menu_Items/your_profile.dart';
+import 'package:cu_events/src/UI/splashscreen/splashscreen.dart';
+import 'package:cu_events/src/provider/favourite_provider.dart';
+import 'package:cu_events/src/provider/search_provider.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/UI/categories/category_view.dart';
-import 'package:cu_events/src/UI/drawer/about_us.dart';
-import 'package:cu_events/src/UI/drawer/feedback.dart';
 import 'package:cu_events/src/UI/events/all_events.dart';
 import 'package:cu_events/src/UI/events/events_details.dart';
 import 'package:cu_events/firebase_options.dart';
@@ -12,7 +20,6 @@ import 'package:cu_events/src/controller/notification.dart';
 import 'package:cu_events/src/UI/login/create_account.dart';
 import 'package:cu_events/src/UI/login/forget_password.dart';
 import 'package:cu_events/src/UI/login/login_screen.dart';
-import 'package:cu_events/src/UI/splashscreen/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,8 +53,12 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]).then((_) {
     runApp(
-      Provider(
-        create: (context) => AuthService(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthService()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
+          ChangeNotifierProvider(create: (_) => FavoriteProvider()),
+        ],
         child: const MyApp(),
       ),
     );
@@ -61,16 +72,28 @@ Future<void> _openImage(String imagePath) async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // final ConnectivityService _connectivityService = ConnectivityService();
+
+  // @override
+  // void dispose() {
+  //   _connectivityService.dispose();
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Acme',
+        fontFamily: 'Montserrat',
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder(),
@@ -105,15 +128,15 @@ class MyApp extends StatelessWidget {
             color: textColor,
           ),
           bodySmall: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.bold,
-            color: whiteColor,
+            color: textColor,
           ),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: primaryBckgnd,
-          iconTheme: IconThemeData(color: Colors.white,size: 30),
+          iconTheme: IconThemeData(color: Colors.white, size: 30),
           titleTextStyle: TextStyle(
             fontSize: 34,
             color: whiteColor,
@@ -135,6 +158,11 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/create': (context) => const CreateAccountPage(),
         '/forgetpassword': (context) => const ForgotPasswordPage(),
+        '/yourprofile': (context) => const EditProfilePage(),
+        '/favourite': (context) => FavoritePage(),
+        '/tos' : (context) => const TermsOfServicePage(),
+        '/faq': (context) => const FAQPage(),
+        '/privacy': (context) => const PrivacyPolicyPage(),
       },
     );
   }
