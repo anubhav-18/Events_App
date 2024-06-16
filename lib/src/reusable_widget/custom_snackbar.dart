@@ -6,6 +6,7 @@ void showCustomSnackBar(
   BuildContext context,
   String message, {
   bool isError = false,
+  bool isLoading = false,
 }) {
   final Color backgroundColor = isError ? Colors.red : primaryBckgnd;
 
@@ -33,16 +34,22 @@ void showCustomSnackBar(
             ],
           ),
         ),
+        isLoading 
+          ? const CircularProgressIndicator(color: whiteColor,strokeWidth: 2,)
+          : const SizedBox.shrink()
       ],
     ),
     backgroundColor: backgroundColor,
     behavior: SnackBarBehavior.floating,
     margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).size.height * 0.02, left: 16, right: 16),
+      bottom: MediaQuery.of(context).size.height * 0.03,
+      left: 16,
+      right: 16,
+    ),
     duration: const Duration(seconds: 3),
     elevation: 6.0,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(25.0),
+      borderRadius: BorderRadius.circular(12.0),
     ),
   );
 

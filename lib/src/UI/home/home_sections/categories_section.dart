@@ -28,9 +28,7 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
       children: [
         Text(
           'Event Categories',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: textColor,
-              ),
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: 10),
         widget.isLoading
@@ -109,39 +107,54 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
     }
   }
 
-  Dialog _buildSubcategoryDialog(String category, List<String> subcategories) {
-    return Dialog(
-      backgroundColor: Colors.transparent, // Transparent background
-      insetPadding:
-          const EdgeInsets.all(20), // Adjust padding from edges of the screen
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: backgndColor,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$category :',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.maxFinite,
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: subcategories
-                    .map((subcategory) =>
-                        _buildSubcategoryGridItem(category, subcategory))
-                    .toList(),
+  Widget _buildSubcategoryDialog(String category, List<String> subcategories) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dialogBackgroundColor: Theme.of(context).brightness == Brightness.light
+            ? backgndColor
+            : darkBckgndColor,
+      ),
+      child: Dialog(
+        backgroundColor: Theme.of(context).brightness == Brightness.light
+            ? backgndColor
+            : darkBckgndColor,
+        surfaceTintColor: Colors.transparent,
+        insetPadding:
+            const EdgeInsets.all(20), // Adjust padding from edges of the screen
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: backgndColor,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$category :',
+                style: Theme.of(context).brightness == Brightness.light
+                    ? Theme.of(context).textTheme.headlineMedium
+                    : Theme.of(context)
+                        .textTheme
+                        .headlineMedium!
+                        .copyWith(color: whiteColor),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.maxFinite,
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: subcategories
+                      .map((subcategory) =>
+                          _buildSubcategoryGridItem(category, subcategory))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -189,14 +202,12 @@ class _EventCategorySelectorState extends State<EventCategorySelector> {
               ),
             ),
             Center(
-              child: Text(
-                subcategory,
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(color: whiteColor),
-              ),
+              child: Text(subcategory,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: whiteColor)),
             ),
           ],
         ),
@@ -233,13 +244,17 @@ class CategoryGridItem extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
+              color: Theme.of(context).shadowColor.withOpacity(0.5),
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 3),
             ),
           ],
-          border: isSelected ? Border.all(color: Colors.blue, width: 2) : null,
+          border: Border.all(
+            color: greyColor.withOpacity(0.2),
+            width: 0.8,
+          ),
+          // isSelected ? Border.all(color: Colors.blue, width: 2) : null,
         ),
         child: Stack(
           children: [
@@ -302,8 +317,7 @@ AssetImage _getBackgroundImageForSubcategory(
           return const AssetImage(
               'assets/images/CategoryImages/TECH_hackathon.png');
         case 'Coding Rounds':
-          return const AssetImage(
-              'assets/images/CategoryImages/tech.jpg');
+          return const AssetImage('assets/images/CategoryImages/tech.jpg');
         default:
           return const AssetImage(
               'assets/images/CategoryImages/EDU_training.png');

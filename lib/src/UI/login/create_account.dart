@@ -89,7 +89,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                       labelText: 'First Name',
                                       controller: _firstnameController,
                                       obscureText: false,
-                                      hintText: 'Enter First Name',
                                     ),
                                   ),
                                   const SizedBox(width: 16),
@@ -98,7 +97,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                       labelText: 'Last Name',
                                       controller: _lastnameController,
                                       obscureText: false,
-                                      hintText: 'Enter Last Name',
                                     ),
                                   ),
                                 ],
@@ -109,7 +107,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 labelText: 'Email',
                                 controller: _emailController,
                                 obscureText: false,
-                                hintText: 'Enter an email',
                                 boolValidator: true,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -128,7 +125,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 labelText: 'Password',
                                 controller: _passwordController,
                                 obscureText: true,
-                                hintText: 'Enter a password',
                                 boolValidator: true,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {

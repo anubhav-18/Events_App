@@ -31,7 +31,6 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   bool _isLoading = true;
   UserModel? _userModel;
-  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -299,7 +298,6 @@ class _MenuPageState extends State<MenuPage> {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
                     [
-                      // Login
                       CustomListTileGroup(
                         tiles: [
                           if (_auth.currentUser != null) ...[
@@ -326,7 +324,6 @@ class _MenuPageState extends State<MenuPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Rate Us
                       CustomListTileGroup(
                         tiles: [
                           menuListTile(
@@ -349,7 +346,6 @@ class _MenuPageState extends State<MenuPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Discover
                       CustomListTileGroup(
                         header: 'Discover', // Optional header
                         tiles: [
@@ -370,24 +366,20 @@ class _MenuPageState extends State<MenuPage> {
                           ),
                           menuListTile(
                             'Favourites',
-                            () {
-                              if (user != null) {
-                                Navigator.of(context).pushNamed('/favourite');
-                              } else {
-                                showCustomSnackBar(context,
-                                    'Please Login, To use this feature',
-                                    isError: true);
-                              }
-                            },
+                            () => Navigator.of(context).pushNamed('/favourite'),
                             'assets/icons/categories/heart.svg',
                           ),
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Support
                       CustomListTileGroup(
                         header: 'Support', // Optional header
                         tiles: [
+                          // menuListTile(
+                          //   'Contact Us',
+                          //   () {},
+                          //   'assets/icons/categories/contact_us.svg',
+                          // ),
                           menuListTile(
                             'Feedback',
                             () => Navigator.of(context).pushNamed('/feedback'),
@@ -401,7 +393,6 @@ class _MenuPageState extends State<MenuPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Legal & About
                       CustomListTileGroup(
                         header: 'Legal & About', // Optional header
                         tiles: [
@@ -423,19 +414,18 @@ class _MenuPageState extends State<MenuPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // More
                       CustomListTileGroup(
                         header: 'More', // Optional header
                         tiles: [
                           menuListTile(
-                            'Invite Friends',
-                            () => Navigator.of(context).pushNamed('/invite'),
-                            'assets/icons/categories/edit.svg',
-                          ),
-                          menuListTile(
                             'Settings',
                             () {},
                             'assets/icons/categories/settings.svg',
+                          ),
+                          menuListTile(
+                            'Invite Friends',
+                            () => Navigator.of(context).pushNamed('/invite'),
+                            'assets/icons/categories/edit.svg',
                           ),
                           if (_auth.currentUser != null) ...[
                             menuListTile(

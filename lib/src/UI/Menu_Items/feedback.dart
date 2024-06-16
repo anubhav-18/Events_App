@@ -1,9 +1,9 @@
-import 'package:cu_events/src/reusable_widget/custom_button.dart';
-import 'package:cu_events/src/reusable_widget/custom_textfiled.dart';
-import 'package:cu_events/src/reusable_widget/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
+import 'package:cu_events/src/reusable_widget/custom_button.dart';
+import 'package:cu_events/src/reusable_widget/custom_textfiled.dart';
+import 'package:cu_events/src/reusable_widget/custom_dropdown.dart';
 
 class FeedbackPage extends StatefulWidget {
   const FeedbackPage({Key? key}) : super(key: key);
@@ -39,7 +39,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
         ),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Expanded(
             child: SingleChildScrollView(
@@ -69,7 +68,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
                         items: _feedbackCategories.map((category) {
                           return DropdownMenuItem(
                             value: category,
-                            child: Text(category),
+                            child: Text(
+                              category,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
                           );
                         }).toList(),
                         onChanged: (value) {
@@ -79,9 +81,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      // Feedback Text Field
                       CustomTextField(
                         labelText: 'Feedback',
-                        hintText: 'Enter your feedback here...',
                         obscureText: false,
                         controller: _feedbackController,
                         keyboardType: TextInputType.multiline,

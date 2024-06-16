@@ -59,8 +59,13 @@ class _FAQPageState extends State<FAQPage> {
               color: textColor,
             ),
           ),
-          collapsedBackgroundColor: Colors.white,
-          backgroundColor: Colors.white,
+          collapsedBackgroundColor:
+              Theme.of(context).brightness == Brightness.light
+                  ? whiteColor
+                  : silver,
+          backgroundColor: Theme.of(context).brightness == Brightness.light
+              ? whiteColor
+              : silver,
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
           expandedAlignment: Alignment.topLeft,
           iconColor: primaryBckgnd,
@@ -102,38 +107,47 @@ final List faqList = [
   },
   {
     "question": "Is CU Events free to use?",
-    "answer": "Yes, CU Events is completely free to download and use. Our goal is to ensure everyone at Chandigarh University can easily access event information without any cost.",
+    "answer":
+        "Yes, CU Events is completely free to download and use. Our goal is to ensure everyone at Chandigarh University can easily access event information without any cost.",
   },
   {
     "question": "Do I need to create an account to use the app?",
-    "answer": "While you can browse events without an account, creating an account allows you to personalize your experience, set reminders, and receive notifications for events you are interested in.",
+    "answer":
+        "While you can browse events without an account, creating an account allows you to personalize your experience, set reminders, and receive notifications for events you are interested in.",
   },
   {
     "question": "How can I find events that match my interests?",
-    "answer": "Once you create an account, you can set your preferences in the app. Based on your interests, CU Events will curate a personalized feed of events that match what you like.",
+    "answer":
+        "Once you create an account, you can set your preferences in the app. Based on your interests, CU Events will curate a personalized feed of events that match what you like.",
   },
   {
     "question": "How often is the event information updated?",
-    "answer": "We work closely with event organizers to ensure that all information is up-to-date. Event details are updated in real-time to provide you with the most accurate and current information.",
+    "answer":
+        "We work closely with event organizers to ensure that all information is up-to-date. Event details are updated in real-time to provide you with the most accurate and current information.",
   },
   {
     "question": "Can I share events with my friends?",
-    "answer": "Yes, you can share event details with your friends directly from the app through social media, email, or messaging platforms.",
+    "answer":
+        "Yes, you can share event details with your friends directly from the app through social media, email, or messaging platforms.",
   },
   {
     "question": "How can I contact the event organizers?",
-    "answer": "Each event listing includes contact details of the organizers. You can reach out to them directly through the provided email or phone number for any specific queries.",
+    "answer":
+        "Each event listing includes contact details of the organizers. You can reach out to them directly through the provided email or phone number for any specific queries.",
   },
   {
     "question": "What types of events are listed on CU Events?",
-    "answer": "CU Events lists a wide range of activities, including academic seminars, cultural festivals, sports events, club meetings, workshops, and much more. There's something for everyone!",
+    "answer":
+        "CU Events lists a wide range of activities, including academic seminars, cultural festivals, sports events, club meetings, workshops, and much more. There's something for everyone!",
   },
   {
     "question": "Can I submit an event to be listed on CU Events?",
-    "answer": "es, if you are an event organizer at Chandigarh University, you can submit your event details through the app. Our team will review and approve it to be listed.",
+    "answer":
+        "es, if you are an event organizer at Chandigarh University, you can submit your event details through the app. Our team will review and approve it to be listed.",
   },
   {
     "question": "Who can I contact for technical support or feedback?",
-    "answer": "For technical support or to provide feedback, you can reach us at [contact email/phone number]. We value your input and are here to help!",
+    "answer":
+        "For technical support or to provide feedback, you can reach us at [contact email/phone number]. We value your input and are here to help!",
   },
 ];

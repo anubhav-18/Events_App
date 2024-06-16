@@ -13,6 +13,15 @@ class CustomListTileGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    // Determine icon color based on theme brightness
+    // Color getIconColor() {
+    //   return brightness == Brightness.dark
+    //       ? Colors.white
+    //       : Theme.of(context).iconTheme.color!;
+    // }
+
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(
@@ -21,31 +30,41 @@ class CustomListTileGroup extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (header != null) 
+          if (header != null)
             Container(
               padding:
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(10.0),
                   topRight: Radius.circular(10.0),
                 ),
-                color: whiteColor,
+                color: theme.brightness == Brightness.light ? whiteColor : null,
+                // color: Theme.of(context).cardColor,
+                // color: theme.brightness == Brightness.light
+                //     ? whiteColor
+                //     : darkBckgndColor,
               ),
               child: Row(
                 children: [
                   Container(
                     width: 4,
                     height: 20,
-                    color: primaryBckgnd,
+                    // color: Theme.of(context).primaryColor,
+                    color: theme.brightness == Brightness.light
+                        ? primaryBckgnd
+                        : primaryBckgnd,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     header!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: primaryBckgnd,
+                      // color: primaryBckgnd,
+                      // color: theme.brightness == Brightness.light
+                      //     ? primaryBckgnd
+                      //     : whiteColor,
                     ),
                   ),
                 ],
@@ -68,7 +87,11 @@ class CustomListTileGroup extends StatelessWidget {
                               Colors.transparent, // Remove default divider
                         ),
                         child: ListTile(
-                          tileColor: whiteColor,
+                          // tileColor: whiteColor,
+                          tileColor: theme.brightness == Brightness.light ? whiteColor : null,
+                          // tileColor: theme.brightness == Brightness.light
+                          //     ? whiteColor
+                          //     : darkBckgndColor,
                           shape: RoundedRectangleBorder(
                             // Round the corners of individual tiles
                             borderRadius: BorderRadius.vertical(
@@ -78,6 +101,7 @@ class CustomListTileGroup extends StatelessWidget {
                                       .zero, // Only round bottom corners of the last tile
                             ),
                           ),
+
                           leading: tile.leading,
                           onTap: tile.onTap,
                           trailing: tile.trailing,

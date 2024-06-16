@@ -70,6 +70,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '32500537433',
     projectId: 'cuevents-1a00b',
     storageBucket: 'cuevents-1a00b.appspot.com',
+    androidClientId: '32500537433-pkdck2fnb2mmo1ni1c9m9o07h7a03cjg.apps.googleusercontent.com',
+    iosClientId: '32500537433-mrrlq6jmjcgsi76q7to5a0tthsv44i3r.apps.googleusercontent.com',
     iosBundleId: 'com.example.cuEvents',
   );
+
 }

@@ -114,7 +114,7 @@ class _AllEventsPageState extends State<AllEventsPage>
                 children: [
                   CachedImage(
                     imageUrl: event.imageUrl,
-                    height: 144, // Adjust image height as needed
+                    height: 155, // Adjust image height as needed
                     width: double.infinity,
                     boxFit: BoxFit.cover,
                   ),

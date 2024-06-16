@@ -43,7 +43,6 @@ class _UpcomingEventsListState extends State<UpcomingEventsList>
 
   @override
   Widget build(BuildContext context) {
-    final favoriteProvider = Provider.of<FavoriteProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -62,7 +61,8 @@ class _UpcomingEventsListState extends State<UpcomingEventsList>
                   itemCount: widget.upcomingEvents.length,
                   itemBuilder: (context, index) {
                     final event = widget.upcomingEvents[index];
-                    
+                    final favoriteProvider =
+                        Provider.of<FavoriteProvider>(context);
                     final isFavorite = favoriteProvider.isFavorite(event.id);
                     return GestureDetector(
                       onTap: () {
@@ -102,40 +102,39 @@ class _UpcomingEventsListState extends State<UpcomingEventsList>
                                     ),
                                   ),
                                 ),
-                                  Positioned(
-                                    top: 0,
-                                    right: 0,
-                                    child: ScaleTransition(
-                                      scale:
-                                          Tween(begin: 1.0, end: 1.2).animate(
-                                        CurvedAnimation(
-                                          parent: _controller,
-                                          curve: Curves.easeOut,
-                                        ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: ScaleTransition(
+                                    scale: Tween(begin: 1.0, end: 1.2).animate(
+                                      CurvedAnimation(
+                                        parent: _controller,
+                                        curve: Curves.easeOut,
                                       ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          if (user != null) {
-                                            favoriteProvider
-                                                .toggleFavorite(event.id);
-                                          } else {
-                                            showCustomSnackBar(context,
-                                                'Please Login, To use this feature',
-                                                isError: true);
-                                          }
-                                        },
-                                        iconSize: 32,
-                                        icon: Icon(
-                                          isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color: isFavorite
-                                              ? Colors.red
-                                              : Colors.white,
-                                        ),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (user != null) {
+                                          favoriteProvider
+                                              .toggleFavorite(event.id);
+                                        } else {
+                                          showCustomSnackBar(context,
+                                              'Please Login, To use this feature',
+                                              isError: true);
+                                        }
+                                      },
+                                      iconSize: 32,
+                                      icon: Icon(
+                                        isFavorite
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color: isFavorite
+                                            ? Colors.red
+                                            : Colors.white,
                                       ),
                                     ),
                                   ),
+                                ),
                               ],
                             ),
                           ),

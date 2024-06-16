@@ -44,7 +44,8 @@ class _FavoritePageState extends State<FavoritePage>
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: greyColor,
+      backgroundColor: Theme.of(context).brightness == Brightness.light
+                        ? greyColor : Colors.black,
       appBar: AppBar(
         title: const Text('Favorite Events'),
       ),
@@ -142,7 +143,9 @@ class _FavoritePageState extends State<FavoritePage>
             bottomLeft: Radius.circular(10),
           ),
           child: Card(
-            color: whiteColor,
+            color: Theme.of(context).brightness == Brightness.light
+                ? whiteColor
+                : darkThemeTile,
             margin: EdgeInsets.zero,
             elevation: 4,
             child: Stack(

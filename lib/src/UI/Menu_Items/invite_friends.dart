@@ -23,40 +23,44 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Invite Friends',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Invite Friends',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.deepPurple,
       ),
-      body: Container(
-        margin: const EdgeInsets.all(16), // Uniform margin for better spacing
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Share the Joy of Our Events App!',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Invite your friends and family to join you in discovering and enjoying amazing events.',
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: FlipCard(
+      body: SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.all(16), // Uniform margin for better spacing
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Share the Joy of Our Events App!',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Invite your friends and family to join you in discovering and enjoying amazing events.',
+                style: Theme.of(context).textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              FlipCard(
                 direction: FlipDirection.HORIZONTAL,
                 front: _buildCardFace(
                   context,
                   'Scan & Download',
-                  _buildQRView(),
+                  _buildQRView(screenWidth),
                   Colors.deepPurple,
                   Colors.purpleAccent,
                   Platform.isAndroid ? playStoreLink : appStoreLink,
@@ -72,23 +76,23 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
                   true,
                 ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Tap the card to flip ',
-              style: TextStyle(
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-                color: Colors.grey[600],
+              const SizedBox(height: 5),
+              Text(
+                'Tap the card to flip',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Lottie.asset(
-              'assets/animation/invite.json',
-              height: 190,
-              repeat: true,
-            ),
-          ],
+              const SizedBox(height: 5),
+              Lottie.asset(
+                'assets/animation/invite.json',
+                width: screenWidth * 0.8,
+                repeat: true,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -101,7 +105,6 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.85,
-        // height: MediaQuery.of(context).size.width * 0.5,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [startColor, endColor],
@@ -110,29 +113,30 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
           ),
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: const EdgeInsets.only(
-            top: 15,
-            bottom: 15,
-            left: 25,
-            right: 25), // Increased padding for better spacing
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             isIcon
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium!
+                              .copyWith(color: whiteColor),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.copy, color: Colors.white),
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: appLink));
+                          Clipboard.setData(ClipboardData(
+                            text: appLink,
+                          ));
                           showCustomSnackBar(context, 'Copied to clipboard');
                         },
                       ),
@@ -140,10 +144,11 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
                   )
                 : Text(
                     title,
-                    style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: whiteColor),
+                    textAlign: TextAlign.center,
                   ),
             const SizedBox(height: 10),
             content,
@@ -153,18 +158,17 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
     );
   }
 
-  QrImageView _buildQRView() {
+  QrImageView _buildQRView(double screenWidth) {
     return QrImageView(
       data: Platform.isAndroid ? playStoreLink : appStoreLink,
       version: QrVersions.auto,
-      size: 250.0,
+      size: screenWidth * 0.6,
       backgroundColor: Colors.white,
     );
   }
 
   Widget _buildLinkView() {
     final appLink = Platform.isAndroid ? playStoreLink : appStoreLink;
-
     return Column(
       children: [
         Text(
@@ -172,7 +176,7 @@ class _InviteFriendsPageState extends State<InviteFriendsPage> {
           textAlign: TextAlign.center,
           style: Theme.of(context)
               .textTheme
-              .bodySmall!
+              .bodyMedium!
               .copyWith(color: whiteColor),
         ),
         const SizedBox(height: 10),

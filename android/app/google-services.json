@@ -39,10 +39,46 @@
               "client_type": 3
             },
             {
-              "client_id": "32500537433-mrrlq6jmjcgsi76q7to5a0tthsv44i3r.apps.googleusercontent.com",
+              "client_id": "32500537433-2cu6heu9pfevttj4l9hmilmnf2u7dvg4.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.cuEvents"
+                "bundle_id": "com.example.cuEventsAdminPanel"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32500537433:android:6bf1e5265597adf4b23948",
+        "android_client_info": {
+          "package_name": "com.example.cu_events_admin_panel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32500537433-1h0re2ubhdms09thvtif2fjfbf9da9o4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASSdD7OcjNqhxn6UMzvIHX8pzS8Xy186o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32500537433-1h0re2ubhdms09thvtif2fjfbf9da9o4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "32500537433-2cu6heu9pfevttj4l9hmilmnf2u7dvg4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cuEventsAdminPanel"
               }
             }
           ]

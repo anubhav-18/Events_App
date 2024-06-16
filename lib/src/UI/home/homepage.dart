@@ -89,7 +89,6 @@ class _HomepageState extends State<Homepage> {
 
   @override
   void dispose() {
-    // Clean up any resources, if necessary
     super.dispose();
   }
 
@@ -102,6 +101,9 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.light
+          ? whiteColor
+          : darkBckgndColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Align(

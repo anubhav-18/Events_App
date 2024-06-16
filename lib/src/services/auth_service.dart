@@ -507,8 +507,7 @@ class AuthService extends ChangeNotifier {
             await FirestoreService().createUserDocument(userModel);
           }
 
-          loggedIn =
-              true; // Set loggedIn to true upon successful Google sign-in
+          loggedIn = true;
           notifyListeners(); // Notify listeners about the change
           print('User signed in with Google: $loggedIn'); // Debug statement
 
@@ -520,8 +519,10 @@ class AuthService extends ChangeNotifier {
           );
         }
         return _userFromFirebaseUser(result.user);
+      } else {
+        showCustomSnackBar(context, 'Google sign-in canceled');
+        return null;
       }
-      return null;
     } catch (error) {
       print('Error signing in with Google: $error'); // Debug statement
       return null;

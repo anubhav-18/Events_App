@@ -23,6 +23,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? error;
 
+  void _stopLoading() {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   } catch (e) {
                                     showCustomSnackBar(context, e.toString());
                                   } finally {
-                                    _isLoading = false;
+                                    _stopLoading();
                                   }
                                 },
                               ),

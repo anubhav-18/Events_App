@@ -35,7 +35,11 @@ class CustomDropdown extends StatelessWidget {
               validator: validator,
               decoration: InputDecoration(
                 labelText: labelText,
-                labelStyle: Theme.of(context).textTheme.bodyLarge,
+                labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? null
+                      : const Color(0xffd9dddc),
+                ),
                 enabledBorder: showBorder
                     ? OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),

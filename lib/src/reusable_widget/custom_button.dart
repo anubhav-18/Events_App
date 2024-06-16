@@ -8,6 +8,8 @@ class CustomElevatedButton extends StatefulWidget {
   final double? height;
   final bool widget; // Changed this to non-nullable
   final Widget? child;
+  final bool isColor;
+  final Color? backgroundColor;
 
   const CustomElevatedButton(
       {Key? key,
@@ -16,6 +18,8 @@ class CustomElevatedButton extends StatefulWidget {
       this.width,
       this.height,
       this.widget = false, // Default to false if not provided
+      this.isColor = false,
+      this.backgroundColor,
       this.child})
       : super(key: key);
 
@@ -75,7 +79,9 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton>
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: _colorAnimation.value,
+                backgroundColor: widget.isColor
+                    ? widget.backgroundColor
+                    : _colorAnimation.value,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),

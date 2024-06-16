@@ -105,7 +105,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
             labelText: widget.labelText,
             hintText: widget.hintText,
             hintStyle: Theme.of(context).textTheme.bodyMedium,
-            labelStyle: Theme.of(context).textTheme.bodyLarge,
+            labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? null
+                      : const Color(0xffd9dddc),
+                ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
               borderSide: const BorderSide(color: greycolor2, width: 2.0),
@@ -138,12 +142,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             colorFilter: const ColorFilter.mode(
                                 primaryBckgnd, BlendMode.srcIn),
                           ),
-                    // Icon(
-                    //   _obscureText ? Icons.visibility_off : Icons.visibility,
-                    //   color: _obscureText
-                    //       ? Colors.grey
-                    //       : primaryBckgnd, // Change color based on state
-                    // ),
                     onPressed: () {
                       setState(() {
                         _obscureText = !_obscureText;

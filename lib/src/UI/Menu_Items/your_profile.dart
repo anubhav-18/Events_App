@@ -35,6 +35,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool _isLoading = true;
   String? _imageUrl;
   UserModel? _userModel;
+  bool _isEdited = false;
 
   final FirestoreService _firestoreService = FirestoreService();
   final AuthService _auth = AuthService();
@@ -55,12 +56,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() {
             _userModel = userModel;
             _firstNameController =
-                TextEditingController(text: userModel.firstName);
+                TextEditingController(text: userModel.firstName)
+                  ..addListener(_checkIfEdited);
             _lastNameController =
-                TextEditingController(text: userModel.lastName);
-            _emailController = TextEditingController(text: userModel.email);
+                TextEditingController(text: userModel.lastName)
+                  ..addListener(_checkIfEdited);
+            _emailController = TextEditingController(text: userModel.email)
+              ..addListener(_checkIfEdited);
             _phoneController =
-                TextEditingController(text: userModel.phoneNo ?? "");
+                TextEditingController(text: userModel.phoneNo ?? "")
+                  ..addListener(_checkIfEdited);
             _selectedGender = userModel.gender;
             _dobController = TextEditingController(
                 text: userModel.dateOfBirth != null
@@ -74,6 +79,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } catch (e) {
       // Handle errors here (e.g., show error message)
       print('Error fetching user data: $e');
+    }
+  }
+
+  void _checkIfEdited() {
+    bool isEdited = _firstNameController.text != _userModel?.firstName ||
+        _lastNameController.text != _userModel?.lastName ||
+        _emailController.text != _userModel?.email ||
+        _phoneController.text != _userModel?.phoneNo ||
+        _selectedGender != _userModel?.gender ||
+        _dobController.text !=
+            (_userModel?.dateOfBirth != null
+                ? DateFormat('yyyy-MM-dd').format(_userModel!.dateOfBirth!)
+                : '');
+    if (isEdited != _isEdited) {
+      setState(() {
+        _isEdited = isEdited;
+      });
     }
   }
 
@@ -129,6 +151,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (image != null) {
       setState(() {
         _image = File(image.path);
+        _isEdited = true;
       });
     }
   }
@@ -147,7 +170,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  // Function to build the profile picture section
   Widget _buildProfilePicture() {
     return Center(
       child: Stack(
@@ -201,7 +223,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // BottomSheet Content
   Widget _buildBottomSheet(BuildContext context) {
     return Container(
       // height: 170, // Adjust height as needed
@@ -265,6 +286,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               setState(() {
                 _image = null;
                 _imageUrl = null;
+                _isEdited = true;
               });
             },
           ),
@@ -319,107 +341,157 @@ class _EditProfilePageState extends State<EditProfilePage> {
         backgroundColor: greyColor,
       ),
       backgroundColor: backgndColor,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+      body: GestureDetector(
+        onTap: () {
+          // Handle tap outside of text field to dismiss keyboard
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Stack(
+          children: [
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
                     children: [
-                      _buildProfilePicture(), // Profile Picture
-                      const SizedBox(height: 20),
-                      // First Name
-                      CustomTextField(
-                        labelText: 'First Name',
-                        controller: _firstNameController,
-                      ),
-                      const SizedBox(height: 20),
-                      // Last Name
-                      CustomTextField(
-                        labelText: 'Last Name',
-                        controller: _lastNameController,
-                      ),
-                      const SizedBox(height: 20),
-                      // Email (non-editable)
-                      CustomTextField(
-                        labelText: 'Email',
-                        controller: _emailController,
-                        readOnly: true,
-                      ),
-                      const SizedBox(height: 20),
-                      // Phone Number
-                      CustomTextField(
-                        labelText: 'Phone Number',
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        prefixIcon: true,
-                        wantValidator: false,
-                      ),
-                      const SizedBox(height: 20),
-                      // Gender Dropdown (optional)
-                      CustomDropdown(
-                        labelText: 'Gender',
-                        value: _selectedGender,
-                        items: [
-                          customDropdownItem('Male'),
-                          customDropdownItem('Female'),
-                          customDropdownItem('Other'),
-                          customDropdownItem('Rather not say'),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedGender = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      CustomTextField(
-                        labelText: 'Date Of Birth',
-                        controller: _dobController,
-                        wantValidator: false,
-                        readOnly: true,
-                        isDateField: true,
-                        onTap: () async {
-                          final DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate: _selectedDateOfBirth ?? DateTime.now(),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                          );
-                          if (picked != null) {
-                            setState(() {
-                              _selectedDateOfBirth = picked;
-                              _dobController.text =
-                                  DateFormat('yyyy-MM-dd').format(picked);
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      // Save Changes Button
-                      CustomElevatedButton(
-                        onPressed: _updateProfile,
-                        title: 'Save Changes',
-                        widget: true,
-                        width: double.infinity,
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : Text(
-                                'Save Changes',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(color: whiteColor),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  _buildProfilePicture(), // Profile Picture
+                                  const SizedBox(height: 20),
+                                  // First Name
+                                  CustomTextField(
+                                    labelText: 'First Name',
+                                    controller: _firstNameController,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // Last Name
+                                  CustomTextField(
+                                    labelText: 'Last Name',
+                                    controller: _lastNameController,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // Email (non-editable)
+                                  CustomTextField(
+                                    labelText: 'Email',
+                                    controller: _emailController,
+                                    readOnly: true,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // Phone Number
+                                  CustomTextField(
+                                    labelText: 'Phone Number',
+                                    controller: _phoneController,
+                                    keyboardType: TextInputType.phone,
+                                    prefixIcon: true,
+                                    wantValidator: false,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // Gender Dropdown (optional)
+                                  CustomDropdown(
+                                    labelText: 'Gender',
+                                    value: _selectedGender,
+                                    items: [
+                                      customDropdownItem('Male'),
+                                      customDropdownItem('Female'),
+                                      customDropdownItem('Other'),
+                                      customDropdownItem('Rather not say'),
+                                    ],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedGender = value;
+                                        _checkIfEdited();
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+                                  CustomTextField(
+                                    labelText: 'Date Of Birth',
+                                    controller: _dobController,
+                                    wantValidator: false,
+                                    readOnly: true,
+                                    isDateField: true,
+                                    onTap: () async {
+                                      final DateTime? picked =
+                                          await showDatePicker(
+                                        context: context,
+                                        initialDate: _selectedDateOfBirth ??
+                                            DateTime.now(),
+                                        firstDate: DateTime(1900),
+                                        lastDate: DateTime.now(),
+                                        builder: (BuildContext context,
+                                            Widget? child) {
+                                          return Theme(
+                                            data: ThemeData.light().copyWith(
+                                              colorScheme:
+                                                  const ColorScheme.light(
+                                                primary:
+                                                    primaryBckgnd, // Head color
+                                                onPrimary: Colors.white,
+                                                onSurface: Colors.black, // Ear
+                                              ),
+                                            ),
+                                            child: child!,
+                                          );
+                                        },
+                                      );
+                                      if (picked != null) {
+                                        setState(() {
+                                          _selectedDateOfBirth = picked;
+                                          _dobController.text =
+                                              DateFormat('yyyy-MM-dd')
+                                                  .format(picked);
+                                          _checkIfEdited();
+                                        });
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
                               ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        color: greyColor,
+                        padding: const EdgeInsets.all(16.0),
+                        child: CustomElevatedButton(
+                          onPressed: _isEdited ? _updateProfile : null,
+                          title: 'Save Changes',
+                          widget: true,
+                          width: double.infinity,
+                          isColor: true,
+                          backgroundColor:
+                              _isEdited ? primaryBckgnd : Colors.grey,
+                          child: _isLoading
+                              ? const CircularProgressIndicator()
+                              : Text(
+                                  'Save Changes',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: _isEdited
+                                            ? whiteColor
+                                            : Colors.black.withOpacity(0.5),
+                                      ),
+                                ),
+                        ),
                       ),
                     ],
                   ),
-                ),
+            if (_isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
               ),
-            ),
+          ],
+        ),
+      ),
     );
   }
 

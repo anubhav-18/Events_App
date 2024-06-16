@@ -8,10 +8,10 @@ import 'package:cu_events/src/UI/Menu_Items/privacy_policy.dart';
 import 'package:cu_events/src/UI/Menu_Items/terms_of_service.dart';
 import 'package:cu_events/src/UI/Menu_Items/your_profile.dart';
 import 'package:cu_events/src/UI/splashscreen/splashscreen.dart';
+import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';
 import 'package:cu_events/src/provider/search_provider.dart';
 import 'package:cu_events/src/services/auth_service.dart';
-import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/UI/Menu_Items/category_view.dart';
 import 'package:cu_events/src/UI/events/all_events.dart';
 import 'package:cu_events/src/UI/events/events_details.dart';
@@ -161,10 +161,11 @@ class _MyAppState extends State<MyApp> {
         '/forgetpassword': (context) => const ForgotPasswordPage(),
         '/yourprofile': (context) => const EditProfilePage(),
         '/favourite': (context) => const FavoritePage(),
-        '/tos' : (context) => const TermsOfServicePage(),
+        '/tos': (context) => const TermsOfServicePage(),
         '/faq': (context) => const FAQPage(),
         '/privacy': (context) => const PrivacyPolicyPage(),
         '/invite': (context) => const InviteFriendsPage(),
+        // '/settings': (context) => const SettingsPage(),
       },
     );
   }
