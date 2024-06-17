@@ -44,11 +44,21 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
+          ),
+        ),
         title: Text(
           'Event Categories',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
-        backgroundColor: primaryBckgnd,
+        elevation: 0,
+        backgroundColor: greyColor,
       ),
       body: _isLoading
           ? _buildShimmerPlaceholder()

@@ -40,14 +40,24 @@ class _FavoritePageState extends State<FavoritePage>
   Widget build(BuildContext context) {
     final favoriteProvider = Provider.of<FavoriteProvider>(context);
     final List<String> favoriteEventIds = favoriteProvider.favoriteEventIds;
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.light
-                        ? greyColor : Colors.black,
       appBar: AppBar(
-        title: const Text('Favorite Events'),
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
+          ),
+        ),
+        title: Text(
+          'Favourite Events',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        elevation: 0,
+        backgroundColor: greyColor,
       ),
       body: favoriteEventIds.isEmpty
           ? const Center(
@@ -72,7 +82,7 @@ class _FavoritePageState extends State<FavoritePage>
                         return const SizedBox(height: 20);
                       } else {
                         final event = snapshot.data![index];
-                        return _buildEventCard(event, width, height, context);
+                        return _buildEventCard(event, context);
                       }
                     },
                   );
@@ -119,143 +129,105 @@ class _FavoritePageState extends State<FavoritePage>
     );
   }
 
-  Widget _buildEventCard(
-    EventModel event,
-    double width,
-    double height,
-    BuildContext context,
-  ) {
-    final cardHeight = height * 0.3;
-    final cardWidth = width;
-    final favoriteProvider = Provider.of<FavoriteProvider>(context);
-    final isFavorite = favoriteProvider.isFavorite(event.id);
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/event_details', arguments: event);
-      },
-      child: Container(
-        margin: width > 600 ? AppMargins.large : AppMargins.medium,
-        height: cardHeight,
-        width: cardWidth,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            bottomLeft: Radius.circular(10),
-          ),
-          child: Card(
-            color: Theme.of(context).brightness == Brightness.light
-                ? whiteColor
-                : darkThemeTile,
-            margin: EdgeInsets.zero,
-            elevation: 4,
-            child: Stack(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10),
-                      ),
-                      child: SizedBox(
-                        height: cardHeight,
-                        width: cardWidth * 0.45,
-                        child: Stack(
-                          children: [
-                            CachedImage(
-                              imageUrl: event.imageUrl,
-                              height: cardHeight,
-                              width: cardWidth * 0.45,
-                              boxFit: BoxFit.fill,
-                            ),
-                            Positioned.fill(
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [Colors.black45, Colors.black26],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: ScaleTransition(
-                                scale: Tween(begin: 1.0, end: 1.2).animate(
-                                  CurvedAnimation(
-                                    parent: _controller,
-                                    curve: Curves.easeOut,
-                                  ),
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    if (user != null) {
-                                      favoriteProvider.toggleFavorite(event.id);
-                                    } else {
-                                      showCustomSnackBar(context,
-                                          'Please Login, To use this feature',
-                                          isError: true);
-                                    }
-                                  },
-                                  iconSize: 32,
-                                  icon: Icon(
-                                    isFavorite
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color:
-                                        isFavorite ? Colors.red : Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 5),
-                          Text(
-                            event.title,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.copyWith(color: primaryBckgnd),
-                          ),
-                          Text(
-                            event.description,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 7,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Text(
-                            'Deadline: ${event.deadline.toString().split(' ')[0]}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Colors.red),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+ Widget _buildEventCard(EventModel event, BuildContext context) {
+  final favoriteProvider = Provider.of<FavoriteProvider>(context);
+  final isFavorite = favoriteProvider.isFavorite(event.id);
+
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0,left: 16,right: 16,bottom: 8),
+    child: Card(
+      color: whiteColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 3,
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, '/event_details', arguments: event);
+        },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(15.0),
+                bottomLeft: Radius.circular(15.0),
+              ),
+              child: CachedImage(
+                imageUrl: event.imageUrl,
+                height: 142, // Adjust the height as needed
+                width: 120, // Adjust the width as needed
+                boxFit: BoxFit.cover,
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        event.title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(fontWeight: FontWeight.bold,fontSize: 20),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        event.description,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(fontWeight: FontWeight.w500,),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Deadline: ${event.deadline.toString().split(' ')[0]}',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.red,fontWeight: FontWeight.w500),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : null,
+                        ),
+                        onPressed: () {
+                          if (user != null) {
+                            favoriteProvider.toggleFavorite(event.id);
+                          } else {
+                            showCustomSnackBar(
+                              context,
+                              'Please Login, To use this feature',
+                              isError: true,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   Widget _buildShimmerPlaceholder(double screenSize, double height) {
     return ListView.builder(
       itemCount: 4,

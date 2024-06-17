@@ -15,7 +15,21 @@ class _FAQPageState extends State<FAQPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FAQs'),
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
+          ),
+        ),
+        title: Text(
+          'FAQs',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        elevation: 0,
+        backgroundColor: greyColor,
       ),
       body: Padding(
         padding:

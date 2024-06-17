@@ -1,3 +1,4 @@
+import 'package:cu_events/src/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
@@ -34,9 +35,21 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Feedback',
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
+          ),
         ),
+        title: Text(
+          'Feedback',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        elevation: 0,
+        backgroundColor: greyColor,
       ),
       body: Column(
         children: <Widget>[
@@ -49,6 +62,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      const SizedBox(
+                        height: 10,
+                      ),
                       CustomTextField(
                         labelText: 'Name',
                         controller: _nameController,

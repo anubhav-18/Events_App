@@ -10,7 +10,21 @@ class PrivacyPolicyPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: backgndColor,
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
+          ),
+        ),
+        title: Text(
+          'Privacy Policy',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        elevation: 0,
+        backgroundColor: greyColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

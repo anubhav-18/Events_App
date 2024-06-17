@@ -75,6 +75,7 @@ dependencies:
   qr_flutter: ^4.1.0
   flip_card: ^0.7.0
   device_calendar: ^4.3.2
+  pinput: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -124,14 +125,20 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: JockeyOne
+    - family: Roboto
       fonts:
-        - asset: assets/fonts/JockeyOne-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-    - family: Acme
-      fonts:
-        - asset: assets/fonts/Acme-Regular.ttf
+        - asset: assets/fonts/Roboto/Roboto-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Roboto/Roboto-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Roboto/Roboto-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Roboto/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto/Roboto-Black.ttf
+          weight: 900
     - family: Montserrat
       fonts:
         - asset: assets/fonts/Montserrat-VariableFont_wght.ttf  

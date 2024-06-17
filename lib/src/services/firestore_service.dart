@@ -5,6 +5,18 @@ import 'package:cu_events/src/models/user_model.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // delete users account forever
+  Future<void> deleteUserAccount(String userId) async {
+    try {
+      // Delete the user document from Firestore
+      await _db.collection('users').doc(userId).delete();
+    } catch (e) {
+      print('Error deleting user account: $e');
+      throw e; // Re-throw the error to be handled in the UI
+    }
+  }
+
+  // update user details
   Future<void> updateUserDetails(UserModel updatedUser) async {
     try {
       await _db
@@ -68,6 +80,38 @@ class FirestoreService {
     return snapshot.docs
         .map((doc) => EventModel.fromFirestore(
             doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  //Completed Events
+  Future<List<EventModel>> getCompletedEvents() async {
+    QuerySnapshot snapshot = await _db
+        .collection('events')
+        .where('enddate', isLessThan: DateTime.now())
+        .get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  // Ongoing Events
+  Future<List<EventModel>> getOngoingEvents() async {
+    // Create a reference to the events collection
+    final eventsRef = _db.collection('events');
+
+    // Get the server timestamp (to avoid timezone issues on client side)
+    final now = FieldValue.serverTimestamp();
+    
+    // Query for ongoing events
+    QuerySnapshot snapshot = await eventsRef
+        .where('startdate', isLessThanOrEqualTo: now)
+        .where('enddate', isGreaterThanOrEqualTo: now)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => EventModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
         .toList();
   }
 
@@ -140,6 +184,7 @@ class FirestoreService {
     return results;
   }
 
+  // Search event by category or subcategory
   Future<List<EventModel>> searchEventsByCategoryOrSubcategory(
       String query) async {
     print("Searching events by category with query: $query");
@@ -173,6 +218,7 @@ class FirestoreService {
     return results;
   }
 
+  // Trending searches
   Future<List<String>> getTrendingSearches() async {
     return Future.delayed(const Duration(seconds: 1),
         () => ['Coding', 'Seminar', 'Workshop', 'Hackathon']);

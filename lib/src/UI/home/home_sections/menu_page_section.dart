@@ -234,7 +234,7 @@ class _MenuPageState extends State<MenuPage> {
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall!
-                      .copyWith(fontSize: 14),
+                      .copyWith(fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -402,7 +402,7 @@ class _MenuPageState extends State<MenuPage> {
                             'assets/icons/categories/about_us.svg',
                           ),
                           menuListTile(
-                            'Privacy & Poilcy',
+                            'Privacy & Policy',
                             () => Navigator.of(context).pushNamed('/privacy'),
                             'assets/icons/categories/privacy_policy.svg',
                           ),
@@ -419,7 +419,7 @@ class _MenuPageState extends State<MenuPage> {
                         tiles: [
                           menuListTile(
                             'Settings',
-                            () {},
+                            () => Navigator.of(context).pushNamed('/settings'),
                             'assets/icons/categories/settings.svg',
                           ),
                           menuListTile(

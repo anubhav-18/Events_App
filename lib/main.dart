@@ -5,6 +5,8 @@ import 'package:cu_events/src/UI/Menu_Items/favourite.dart';
 import 'package:cu_events/src/UI/Menu_Items/feedback.dart';
 import 'package:cu_events/src/UI/Menu_Items/invite_friends.dart';
 import 'package:cu_events/src/UI/Menu_Items/privacy_policy.dart';
+import 'package:cu_events/src/UI/Menu_Items/settings/reset_password.dart';
+import 'package:cu_events/src/UI/Menu_Items/settings/settings.dart';
 import 'package:cu_events/src/UI/Menu_Items/terms_of_service.dart';
 import 'package:cu_events/src/UI/Menu_Items/your_profile.dart';
 import 'package:cu_events/src/UI/splashscreen/splashscreen.dart';
@@ -94,7 +96,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Roboto',
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder(),
@@ -107,31 +109,37 @@ class _MyAppState extends State<MyApp> {
           headlineLarge: TextStyle(
             fontSize: 34,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Montserrat',
+            fontFamily: 'Roboto',
             color: whiteColor,
           ),
           headlineMedium: TextStyle(
             fontSize: 26,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Roboto',
+            color: textColor,
+          ),
+          headlineSmall: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Roboto',
             color: textColor,
           ),
           bodyLarge: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Montserrat',
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Roboto',
             color: textColor,
           ),
           bodyMedium: TextStyle(
             fontSize: 18,
-            fontFamily: 'Montserrat',
-            fontWeight: FontWeight.bold,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w500,
             color: textColor,
           ),
           bodySmall: TextStyle(
             fontSize: 16,
-            fontFamily: 'Montserrat',
-            fontWeight: FontWeight.bold,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w300,
             color: textColor,
           ),
         ),
@@ -141,8 +149,8 @@ class _MyAppState extends State<MyApp> {
           titleTextStyle: TextStyle(
             fontSize: 34,
             color: whiteColor,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Roboto',
           ),
         ),
         colorScheme: ColorScheme.fromSeed(seedColor: primaryBckgnd),
@@ -165,7 +173,8 @@ class _MyAppState extends State<MyApp> {
         '/faq': (context) => const FAQPage(),
         '/privacy': (context) => const PrivacyPolicyPage(),
         '/invite': (context) => const InviteFriendsPage(),
-        // '/settings': (context) => const SettingsPage(),
+        '/settings': (context) => const SettingsPage(),
+        '/resetpassword': (context) => const ResetPasswordPage(),
       },
     );
   }

@@ -1,12 +1,15 @@
 import 'package:cu_events/src/provider/favourite_provider.dart';
 import 'package:cu_events/src/reusable_widget/cachedImage.dart';
 import 'package:cu_events/src/constants.dart';
+import 'package:cu_events/src/reusable_widget/custom_button.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/models/event_model.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -28,11 +31,22 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage>
     with SingleTickerProviderStateMixin {
   final FirestoreService _firestoreService = FirestoreService();
-  List<EventModel> _events = [];
+  // List<EventModel> _events = [];
   bool _isLoading = true;
-  late AnimationController _controller;
   final AuthService authService = AuthService();
   final user = FirebaseAuth.instance.currentUser;
+
+  List<EventModel> _events = [];
+  List<EventModel> _filteredEvents = [];
+  List<String> _selectedFilters = [];
+  bool _showNoEventsMessage = false;
+
+  // String? filterValue;
+  final List<String> _filters = [
+    "Upcoming Events",
+    "Completed Events",
+    "Ongoing Events",
+  ];
 
   String capitalize(String text) {
     if (text.isEmpty) {
@@ -46,16 +60,17 @@ class _EventsPageState extends State<EventsPage>
 
   Future<void> _fetchEvents() async {
     try {
-      _events = await _firestoreService.getEventsByCategoryAndSubcategory(
+      final events = await _firestoreService.getEventsByCategoryAndSubcategory(
         widget.category,
         widget.subcategory ?? '',
       );
-    } catch (e) {
-      print('Error fetching events: $e');
-    } finally {
       setState(() {
+        _events = events;
+        _filteredEvents = List.from(_events);
         _isLoading = false;
       });
+    } catch (e) {
+      print('Error fetching events: $e');
     }
   }
 
@@ -63,16 +78,6 @@ class _EventsPageState extends State<EventsPage>
   void initState() {
     super.initState();
     _fetchEvents();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -88,24 +93,48 @@ class _EventsPageState extends State<EventsPage>
               ? toBeginningOfSentenceCase(widget.subcategory!)
               : toBeginningOfSentenceCase(widget.category),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return _filterBottom();
+                  });
+            },
+            icon: SvgPicture.asset(
+              'assets/icons/filter.svg',
+              width: 25,
+              height: 25,
+              colorFilter: const ColorFilter.mode(
+                whiteColor,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _fetchEvents,
           child: _isLoading
               ? _buildShimmerPlaceholder(width, height)
-              : _events.isEmpty
-                  ? const Center(child: Text('No events found.'))
+              : _showNoEventsMessage || _events.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No events found at this moment.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    )
                   : ListView.builder(
-                      itemCount: _events.length + 1,
+                      itemCount: _filteredEvents.length +
+                          1, // Add one extra item for the SizedBox
                       itemBuilder: (context, index) {
-                        if (index == _events.length) {
-                          return const SizedBox(
-                            height: 20,
-                          );
+                        if (index < _filteredEvents.length) {
+                          return _buildEventCard(
+                              _filteredEvents[index], width, height);
                         } else {
-                          final event = _events[index];
-                          return _buildEventCard(event, width, height);
+                          return const SizedBox(height: 20);
                         }
                       },
                     ),
@@ -119,7 +148,7 @@ class _EventsPageState extends State<EventsPage>
     double width,
     double height,
   ) {
-    final cardHeight = height * 0.3;
+    final cardHeight = height * 0.28;
     final cardWidth = width;
     final favoriteProvider = Provider.of<FavoriteProvider>(context);
     final isFavorite = favoriteProvider.isFavorite(event.id);
@@ -175,31 +204,22 @@ class _EventsPageState extends State<EventsPage>
                             Positioned(
                               top: 0,
                               right: 0,
-                              child: ScaleTransition(
-                                scale: Tween(begin: 1.0, end: 1.2).animate(
-                                  CurvedAnimation(
-                                    parent: _controller,
-                                    curve: Curves.easeOut,
-                                  ),
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    if (user != null) {
-                                      favoriteProvider.toggleFavorite(event.id);
-                                    } else {
-                                      showCustomSnackBar(context,
-                                          'Please Login, To use this feature',
-                                          isError: true);
-                                    }
-                                  },
-                                  iconSize: 32,
-                                  icon: Icon(
-                                    isFavorite
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color:
-                                        isFavorite ? Colors.red : Colors.white,
-                                  ),
+                              child: IconButton(
+                                onPressed: () {
+                                  if (user != null) {
+                                    favoriteProvider.toggleFavorite(event.id);
+                                  } else {
+                                    showCustomSnackBar(context,
+                                        'Please Login, To use this feature',
+                                        isError: true);
+                                  }
+                                },
+                                iconSize: 32,
+                                icon: Icon(
+                                  isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isFavorite ? Colors.red : Colors.white,
                                 ),
                               ),
                             ),
@@ -216,25 +236,36 @@ class _EventsPageState extends State<EventsPage>
                           Text(
                             event.title,
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                            maxLines: 2,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
-                                ?.copyWith(color: primaryBckgnd),
+                                ?.copyWith(
+                                    color: primaryBckgnd,
+                                    fontWeight: FontWeight.bold),
                           ),
                           Text(
                             event.description,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 7,
-                            style: Theme.of(context).textTheme.bodySmall,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(fontWeight: FontWeight.w500),
                           ),
+                          const Spacer(),
                           Text(
                             'Deadline: ${event.deadline.toString().split(' ')[0]}',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
-                                ?.copyWith(color: Colors.red),
+                                ?.copyWith(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w500),
                           ),
+                          const SizedBox(
+                            height: 10,
+                          )
                         ],
                       ),
                     ),
@@ -246,6 +277,103 @@ class _EventsPageState extends State<EventsPage>
         ),
       ),
     );
+  }
+
+  Widget _filterBottom() {
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+      return Container(
+        padding: const EdgeInsets.all(16.0),
+        height: MediaQuery.of(context).size.height * 0.4,
+        decoration: const BoxDecoration(
+          color: backgndColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Filter Events',
+              style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                    color: primaryBckgnd,
+                  ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            // Filter Options
+            Expanded(
+              child: ListView(
+                children: _filters.map((filter) {
+                  return CheckboxListTile(
+                    title: Text(
+                      filter,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    value: _selectedFilters.contains(filter),
+                    activeColor: primaryBckgnd,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value != null && value) {
+                          _selectedFilters.add(filter);
+                        } else {
+                          _selectedFilters.remove(filter);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            Center(
+              child: CustomElevatedButton(
+                onPressed: () {
+                  _applyFilter();
+                  Navigator.pop(context); // Close the bottom sheet
+                },
+                title: 'Apply Filter',
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Future<void> _applyFilter() async {
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+    try {
+      _filteredEvents = _events.where((event) {
+        bool isUpcoming = _selectedFilters.contains('Upcoming Events') &&
+            event.startdate!.isAfter(DateTime.now());
+        bool isCompleted = _selectedFilters.contains('Completed Events') &&
+            event.enddate!.isBefore(DateTime.now());
+        bool isOngoing = _selectedFilters.contains('Ongoing Events') &&
+            event.startdate!.isBefore(DateTime.now()) &&
+            event.enddate!.isAfter(DateTime.now());
+
+        // If no filters are selected, show all events
+        return _selectedFilters.isEmpty ||
+            isUpcoming ||
+            isCompleted ||
+            isOngoing;
+      }).toList();
+      setState(() {
+        _showNoEventsMessage = _filteredEvents.isEmpty;
+      });
+    } catch (e) {
+      // Handle errors here (e.g., show error message)
+      print('Error fetching events: $e');
+    } finally {
+      setState(() {
+        _isLoading = false; // Done loading
+      });
+    }
   }
 
   Widget _buildShimmerPlaceholder(double screenSize, double height) {
@@ -264,66 +392,6 @@ class _EventsPageState extends State<EventsPage>
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class AnimatedIconButton extends StatefulWidget {
-  final bool isLiked;
-  final VoidCallback onPressed;
-
-  const AnimatedIconButton({
-    Key? key,
-    required this.isLiked,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  _AnimatedIconButtonState createState() => _AnimatedIconButtonState();
-}
-
-class _AnimatedIconButtonState extends State<AnimatedIconButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: IconButton(
-        iconSize: 32,
-        icon: Icon(
-          widget.isLiked ? Icons.favorite : Icons.favorite_border,
-          color: widget.isLiked ? Colors.red : Colors.white,
-        ),
-        onPressed: () {
-          widget.onPressed();
-          _controller.forward().then((_) => _controller.reverse());
-        },
       ),
     );
   }

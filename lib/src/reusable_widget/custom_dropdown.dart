@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cu_events/src/constants.dart'; 
+import 'package:cu_events/src/constants.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String labelText;
@@ -28,18 +28,18 @@ class CustomDropdown extends StatelessWidget {
           child: ButtonTheme(
             alignedDropdown: true,
             child: DropdownButtonFormField<String>(
+              style: Theme.of(context).textTheme.bodyMedium,
               value: value,
-              items: items,              
+              items: items,
               dropdownColor: whiteColor,
               onChanged: onChanged,
               validator: validator,
               decoration: InputDecoration(
                 labelText: labelText,
-                labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? null
-                      : const Color(0xffd9dddc),
-                ),
+                labelStyle: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: greycolor2),
                 enabledBorder: showBorder
                     ? OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),

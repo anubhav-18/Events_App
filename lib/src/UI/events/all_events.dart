@@ -1,10 +1,13 @@
+import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';
+import 'package:cu_events/src/reusable_widget/custom_button.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/models/event_model.dart';
 import 'package:cu_events/src/reusable_widget/cachedImage.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -20,10 +23,20 @@ class AllEventsPage extends StatefulWidget {
 class _AllEventsPageState extends State<AllEventsPage>
     with SingleTickerProviderStateMixin {
   final FirestoreService _firestoreService = FirestoreService();
-  List<EventModel> _allEvents = [];
   bool _isLoading = true;
   late AnimationController _controller;
   final user = FirebaseAuth.instance.currentUser;
+
+  List<EventModel> _allEvents = [];
+  List<EventModel> _filteredEvents = [];
+  List<String> _selectedFilters = [];
+  bool _showNoEventsMessage = false;
+
+  final List<String> _filters = [
+    "Upcoming Events",
+    "Completed Events",
+    "Ongoing Events",
+  ];
 
   @override
   void initState() {
@@ -37,14 +50,15 @@ class _AllEventsPageState extends State<AllEventsPage>
 
   Future<void> _fetchAllEvents() async {
     try {
-      _allEvents = await _firestoreService.getAllEvents();
-    } catch (e) {
-      print('Error fetching all events: $e');
-      // TODO: Handle error appropriately (e.g., show error message)
-    } finally {
+      // _allEvents = await _firestoreService.getAllEvents();
+      final allEvents = await _firestoreService.getAllEvents();
       setState(() {
+        _allEvents = allEvents;
+        _filteredEvents = List.from(_allEvents);
         _isLoading = false;
       });
+    } catch (e) {
+      print('Error fetching all events: $e');
     }
   }
 
@@ -58,20 +72,50 @@ class _AllEventsPageState extends State<AllEventsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'All Events',
-          style: GoogleFonts.montserrat(
-            // Use Montserrat for app bar title
-            fontWeight: FontWeight.bold,
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
           ),
         ),
-        elevation: 0, // Remove app bar shadow
+        title: Text(
+          'All Events',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        elevation: 0,
+        backgroundColor: greyColor,
+        actions: [
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return _filterBottom();
+                  });
+            },
+            icon: SvgPicture.asset(
+              'assets/icons/filter.svg',
+              width: 25,
+              height: 25,
+              colorFilter: const ColorFilter.mode(
+                Colors.black,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? _buildShimmerPlaceholder()
-          : _allEvents.isEmpty
-              ? const Center(
-                  child: Text('No events found.'),
+          : _showNoEventsMessage || _allEvents.isEmpty
+              ? Center(
+                  child: Text(
+                    'No events found at this moment.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 )
               : GridView.builder(
                   padding: const EdgeInsets.all(16), // Add padding to the grid
@@ -81,9 +125,9 @@ class _AllEventsPageState extends State<AllEventsPage>
                     crossAxisSpacing: 16.0,
                     mainAxisSpacing: 16.0,
                   ),
-                  itemCount: _allEvents.length,
+                  itemCount: _filteredEvents.length,
                   itemBuilder: (context, index) {
-                    return _buildEventCard(_allEvents[index]);
+                    return _buildEventCard(_filteredEvents[index]);
                   },
                 ),
     );
@@ -205,6 +249,109 @@ class _AllEventsPageState extends State<AllEventsPage>
         ),
       ),
     );
+  }
+
+  Widget _filterBottom() {
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          height: MediaQuery.of(context).size.height *
+              0.4, // Adjust height as needed
+          decoration: const BoxDecoration(
+            color: backgndColor,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Filter Events',
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: primaryBckgnd,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                // Let the list take up remaining space
+                child: ListView(
+                  children: _filters.map((filter) {
+                    return CheckboxListTile(
+                      title: Text(
+                        filter,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      activeColor: primaryBckgnd,
+                      value: _selectedFilters.contains(filter),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value != null && value) {
+                            _selectedFilters.add(filter);
+                          } else {
+                            _selectedFilters.remove(filter);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              Center(
+                child: CustomElevatedButton(
+                  onPressed: () {
+                    _applyFilter();
+                    Navigator.pop(context); // Close the bottom sheet
+                  },
+                  title: 'Apply Filter',
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _applyFilter() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      _filteredEvents = _allEvents.where((event) {
+        bool isUpcoming = _selectedFilters.contains('Upcoming Events') &&
+            event.startdate!.isAfter(DateTime.now());
+        bool isCompleted = _selectedFilters.contains('Completed Events') &&
+            event.enddate!.isBefore(DateTime.now());
+        bool isOngoing = _selectedFilters.contains('Ongoing Events') &&
+            event.startdate!.isBefore(DateTime.now()) &&
+            event.enddate!.isAfter(DateTime.now());
+
+        // If no filters are selected, show all events
+        return _selectedFilters.isEmpty ||
+            isUpcoming ||
+            isCompleted ||
+            isOngoing;
+      }).toList();
+      setState(() {
+        _showNoEventsMessage = _filteredEvents.isEmpty;
+      });
+    } catch (e) {
+      print('Error applying filter: $e');
+      // TODO: Handle error appropriately
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   // Shimmer Placeholder

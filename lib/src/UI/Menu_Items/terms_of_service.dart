@@ -37,16 +37,21 @@ We may update these Terms from time to time. Please check back regularly for any
     return Scaffold(
       backgroundColor: backgndColor,
       appBar: AppBar(
+        titleSpacing: 0,
         leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(
             Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
           ),
-          onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Terms of Service',
+        title: Text(
+          'Terms of service',
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         elevation: 0,
+        backgroundColor: greyColor,
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 0, left: 8, right: 8,bottom: 8),

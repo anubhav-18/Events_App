@@ -19,16 +19,18 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1, milliseconds: 500),
       vsync: this,
     )..forward();
 
     _animation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOutQuad);
 
-    Timer(const Duration(seconds: 4), () { // Adjust timing as needed
+    Timer(const Duration(seconds: 2,milliseconds: 500), () {
+      // Adjust timing as needed
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute( // Use MaterialPageRoute to pass context to AuthGate
+        MaterialPageRoute(
+          // Use MaterialPageRoute to pass context to AuthGate
           builder: (context) => const AuthGate(),
         ),
       );

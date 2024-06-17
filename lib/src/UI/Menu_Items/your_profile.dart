@@ -111,6 +111,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           imageUrl = await _uploadImageToFirebase(_image!);
         }
 
+        UserModel? latestUserData =
+            await _firestoreService.getUserDetails(_userModel!.id);
+
         UserModel updatedUser = UserModel(
           id: _userModel!.id,
           firstName: _firstNameController.text,
@@ -118,7 +121,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           email: _emailController.text,
           phoneNo: _phoneController.text,
           gender: _selectedGender,
-          dateOfBirth: _selectedDateOfBirth,
+          dateOfBirth: _selectedDateOfBirth ?? latestUserData?.dateOfBirth,
           profilePicture: imageUrl,
         );
 
@@ -343,7 +346,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       backgroundColor: backgndColor,
       body: GestureDetector(
         onTap: () {
-          // Handle tap outside of text field to dismiss keyboard
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Stack(
@@ -387,8 +389,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     labelText: 'Phone Number',
                                     controller: _phoneController,
                                     keyboardType: TextInputType.phone,
-                                    prefixIcon: true,
-                                    wantValidator: false,
+                                    isPrefixIcon: true,
+                                    prefixIcon: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '+91',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                          ),
+                                        ),
+                                        const VerticalDivider(
+                                          color: Colors.black,
+                                          thickness: 1,
+                                          width: 20,
+                                        ),
+                                      ],
+                                    ),
+                                    wantValidator: true,
+                                    boolValidator: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return null; // Allows empty input
+                                      } else if (!RegExp(r'^[6-9]\d{9}$')
+                                          .hasMatch(value)) {
+                                        return 'Please enter a valid Phone Number';
+                                      }
+                                      return null; // Valid input
+                                    },
                                   ),
                                   const SizedBox(height: 20),
                                   // Gender Dropdown (optional)

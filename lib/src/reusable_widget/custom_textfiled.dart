@@ -16,11 +16,13 @@ class CustomTextField extends StatefulWidget {
   final bool isEnabled;
   final void Function(String)? onChanged; // Add onChanged property
   final bool boolValidator;
-  final bool prefixIcon;
+  final bool isPrefixIcon;
   final bool isDateField;
   final bool readOnly;
   final VoidCallback? onTap;
   final bool wantValidator;
+  final Widget? prefixIcon;
+  final bool isPhone;
 
   const CustomTextField({
     Key? key,
@@ -35,11 +37,13 @@ class CustomTextField extends StatefulWidget {
     this.maxLines,
     this.isEnabled = true,
     this.boolValidator = false,
-    this.prefixIcon = false,
+    this.isPrefixIcon = false,
     this.isDateField = false,
     this.readOnly = false,
     this.wantValidator = true,
+    this.isPhone = false,
     this.onTap,
+    this.prefixIcon,
   }) : super(key: key);
 
   @override
@@ -62,54 +66,38 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: widget.isEnabled,
           maxLines: widget.obscureText ? 1 : widget.maxLines,
           keyboardType: widget.isDateField
-              ? widget.prefixIcon
+              ? widget.isPrefixIcon
                   ? TextInputType.phone
                   : TextInputType.none
-              : widget.prefixIcon
+              : widget.isPrefixIcon
                   ? TextInputType.phone
                   : widget.keyboardType,
           readOnly: widget.readOnly,
           onTap: widget.readOnly
               ? widget.isDateField
                   ? widget.onTap
-                  : () {
-                      showCustomSnackBar(context, 'Email cannot be change.');
-                    }
+                  : widget.isPhone
+                      ? widget.onTap
+                      : () {
+                          showCustomSnackBar(
+                              context, 'Email cannot be change.');
+                        }
               : widget.isDateField
                   ? widget.onTap
                   : null,
-          style: GoogleFonts.montserrat(
-            color: textColor,
-            fontSize: 18,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium,
           decoration: InputDecoration(
-            prefixIcon: widget.prefixIcon
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Text(
-                          '+91',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                      const VerticalDivider(
-                        color: Colors.black,
-                        thickness: 1,
-                        width: 20,
-                      ),
-                    ],
-                  )
-                : null,
+            prefixIcon: widget.isPrefixIcon ? widget.prefixIcon : null,
             labelText: widget.labelText,
             hintText: widget.hintText,
-            hintStyle: Theme.of(context).textTheme.bodyMedium,
-            labelStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? null
-                      : const Color(0xffd9dddc),
-                ),
+            hintStyle: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: greycolor2),
+            labelStyle: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: greycolor2),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
               borderSide: const BorderSide(color: greycolor2, width: 2.0),
