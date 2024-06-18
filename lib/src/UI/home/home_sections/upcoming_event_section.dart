@@ -93,8 +93,8 @@ class _UpcomingEventsListState extends State<UpcomingEventsList>
                                     decoration: const BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          Colors.black45,
-                                          Colors.black26
+                                          Colors.black26,
+                                          Colors.black12,
                                         ],
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,

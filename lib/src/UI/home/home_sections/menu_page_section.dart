@@ -360,11 +360,6 @@ class _MenuPageState extends State<MenuPage> {
                             'assets/icons/categories/all_events.svg',
                           ),
                           menuListTile(
-                            'Categories',
-                            () => Navigator.of(context).pushNamed('/category'),
-                            'assets/icons/categories/categories.svg',
-                          ),
-                          menuListTile(
                             'Favourites',
                             () => Navigator.of(context).pushNamed('/favourite'),
                             'assets/icons/categories/heart.svg',
@@ -375,11 +370,6 @@ class _MenuPageState extends State<MenuPage> {
                       CustomListTileGroup(
                         header: 'Support', // Optional header
                         tiles: [
-                          // menuListTile(
-                          //   'Contact Us',
-                          //   () {},
-                          //   'assets/icons/categories/contact_us.svg',
-                          // ),
                           menuListTile(
                             'Feedback',
                             () => Navigator.of(context).pushNamed('/feedback'),

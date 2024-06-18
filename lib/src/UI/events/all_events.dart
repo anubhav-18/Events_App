@@ -252,12 +252,12 @@ class _AllEventsPageState extends State<AllEventsPage>
   }
 
   Widget _filterBottom() {
+    List<String> tempSelectedFilters = List.from(_selectedFilters);
+
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
         return Container(
           padding: const EdgeInsets.all(16.0),
-          height: MediaQuery.of(context).size.height *
-              0.4, // Adjust height as needed
           decoration: const BoxDecoration(
             color: backgndColor,
             borderRadius: BorderRadius.only(
@@ -265,8 +265,7 @@ class _AllEventsPageState extends State<AllEventsPage>
               topRight: Radius.circular(20),
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -280,33 +279,33 @@ class _AllEventsPageState extends State<AllEventsPage>
                 ],
               ),
               const SizedBox(height: 16),
-              Expanded(
-                // Let the list take up remaining space
-                child: ListView(
-                  children: _filters.map((filter) {
-                    return CheckboxListTile(
-                      title: Text(
-                        filter,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      activeColor: primaryBckgnd,
-                      value: _selectedFilters.contains(filter),
-                      onChanged: (bool? value) {
-                        setState(() {
-                          if (value != null && value) {
-                            _selectedFilters.add(filter);
-                          } else {
-                            _selectedFilters.remove(filter);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+              Column(
+                children: _filters.map((filter) {
+                  return CheckboxListTile(
+                    title: Text(
+                      filter,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    activeColor: primaryBckgnd,
+                    value: tempSelectedFilters.contains(filter),
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value != null && value) {
+                          tempSelectedFilters.add(filter);
+                        } else {
+                          tempSelectedFilters.remove(filter);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
               ),
               Center(
                 child: CustomElevatedButton(
                   onPressed: () {
+                    setState(() {
+                      _selectedFilters = List.from(tempSelectedFilters);
+                    });
                     _applyFilter();
                     Navigator.pop(context); // Close the bottom sheet
                   },

@@ -137,12 +137,16 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
                   children: [
                     Text(
                       event.title,
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: whiteColor),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: whiteColor),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${DateFormat('MMM d').format(event.startdate!)} - ${DateFormat('MMM d').format(event.enddate!)}',
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(color: whiteColor),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: whiteColor, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),

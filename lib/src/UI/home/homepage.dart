@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cu_events/src/UI/home/home_sections/ongoing_section.dart';
 import 'package:cu_events/src/UI/home/home_sections/profile_picture.dart';
 import 'package:cu_events/src/models/user_model.dart';
 import 'package:cu_events/src/services/auth_service.dart';
@@ -30,6 +31,7 @@ class _HomepageState extends State<Homepage> {
   final FirestoreService _firestoreService = FirestoreService();
   List<EventModel> _popularEvents = [];
   List<EventModel> _upcomingEvents = [];
+  List<EventModel> _ongoingEvents = [];
   bool _isLoading = true;
   String? _selectedCategory;
   UserModel? _userModel;
@@ -47,6 +49,14 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> _fetchEvents() async {
     try {
+      List<EventModel> allEvents = await _firestoreService.getAllEvents();
+
+      _ongoingEvents = allEvents
+          .where((event) =>
+              event.startdate!.isBefore(DateTime.now()) &&
+              event.enddate!.isAfter(DateTime.now()))
+          .toList();
+
       _popularEvents = await _firestoreService.getPopularEvents();
       _upcomingEvents = await _firestoreService.getUpcomingEvents();
     } catch (e) {
@@ -101,24 +111,25 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.light
-          ? whiteColor
-          : darkBckgndColor,
+      backgroundColor: whiteColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Align(
+        title: Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            'CU EVENTS',
+            'CU Events',
+            style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                fontFamily: 'KingsmanDemo', color: Colors.black, fontSize: 36),
           ),
         ),
+        backgroundColor: greyColor,
         actions: [
           // Search Button
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
               colorFilter: const ColorFilter.mode(
-                whiteColor,
+                Colors.black,
                 BlendMode.srcIn,
               ),
             ),
@@ -153,6 +164,8 @@ class _HomepageState extends State<Homepage> {
         elevation: 8,
       ),
       body: RefreshIndicator(
+        backgroundColor: whiteColor,
+        color: primaryBckgnd,
         onRefresh: _refreshAllData,
         child: SingleChildScrollView(
           child: Container(
@@ -170,7 +183,14 @@ class _HomepageState extends State<Homepage> {
                   selectedCategory: _selectedCategory,
                   isLoading: _isLoading,
                 ),
-                const SizedBox(height: 20),
+                // Ongoing Events
+                if (_ongoingEvents.isNotEmpty) ...[
+                  OngoingEventsList(
+                    isLoading: _isLoading,
+                    ongoingEvents: _ongoingEvents,
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 // Upcoming Events Section
                 UpcomingEventsList(
                   upcomingEvents: _upcomingEvents,

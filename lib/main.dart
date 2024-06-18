@@ -14,7 +14,6 @@ import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';
 import 'package:cu_events/src/provider/search_provider.dart';
 import 'package:cu_events/src/services/auth_service.dart';
-import 'package:cu_events/src/UI/Menu_Items/category_view.dart';
 import 'package:cu_events/src/UI/events/all_events.dart';
 import 'package:cu_events/src/UI/events/events_details.dart';
 import 'package:cu_events/firebase_options.dart';
@@ -163,7 +162,7 @@ class _MyAppState extends State<MyApp> {
         '/allevents': (context) => const AllEventsPage(),
         '/feedback': (context) => const FeedbackPage(),
         '/aboutus': (context) => const AboutUsPage(),
-        '/category': (context) => const CategoriesPage(),
+        // '/category': (context) => const CategoriesPage(),
         '/login': (context) => const LoginScreen(),
         '/create': (context) => const CreateAccountPage(),
         '/forgetpassword': (context) => const ForgotPasswordPage(),

@@ -30,7 +30,6 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage>
     with SingleTickerProviderStateMixin {
   final FirestoreService _firestoreService = FirestoreService();
-  // List<EventModel> _events = [];
   bool _isLoading = true;
   final AuthService authService = AuthService();
   final user = FirebaseAuth.instance.currentUser;
@@ -40,7 +39,6 @@ class _EventsPageState extends State<EventsPage>
   List<String> _selectedFilters = [];
   bool _showNoEventsMessage = false;
 
-  // String? filterValue;
   final List<String> _filters = [
     "Upcoming Events",
     "Completed Events",
@@ -85,12 +83,23 @@ class _EventsPageState extends State<EventsPage>
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: greyColor,
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: greyColor,
+        titleSpacing: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 22,
+          ),
+        ),
         title: Text(
           widget.subcategory != null
               ? toBeginningOfSentenceCase(widget.subcategory!)
               : toBeginningOfSentenceCase(widget.category),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         actions: [
           IconButton(
@@ -106,7 +115,7 @@ class _EventsPageState extends State<EventsPage>
               width: 25,
               height: 25,
               colorFilter: const ColorFilter.mode(
-                whiteColor,
+                Colors.black,
                 BlendMode.srcIn,
               ),
             ),
@@ -279,11 +288,11 @@ class _EventsPageState extends State<EventsPage>
   }
 
   Widget _filterBottom() {
+    List<String> tempSelectedFilters = List.from(_selectedFilters);
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
       return Container(
         padding: const EdgeInsets.all(16.0),
-        height: MediaQuery.of(context).size.height * 0.4,
         decoration: const BoxDecoration(
           color: backgndColor,
           borderRadius: BorderRadius.only(
@@ -291,8 +300,7 @@ class _EventsPageState extends State<EventsPage>
             topRight: Radius.circular(20),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Wrap(
           children: [
             Text(
               'Filter Events',
@@ -303,33 +311,33 @@ class _EventsPageState extends State<EventsPage>
             const SizedBox(
               height: 16,
             ),
-            // Filter Options
-            Expanded(
-              child: ListView(
-                children: _filters.map((filter) {
-                  return CheckboxListTile(
-                    title: Text(
-                      filter,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    value: _selectedFilters.contains(filter),
-                    activeColor: primaryBckgnd,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (value != null && value) {
-                          _selectedFilters.add(filter);
-                        } else {
-                          _selectedFilters.remove(filter);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
+            Column(
+              children: _filters.map((filter) {
+                return CheckboxListTile(
+                  title: Text(
+                    filter,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  value: tempSelectedFilters.contains(filter),
+                  activeColor: primaryBckgnd,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      if (value != null && value) {
+                        tempSelectedFilters.add(filter);
+                      } else {
+                        tempSelectedFilters.remove(filter);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
             ),
             Center(
               child: CustomElevatedButton(
                 onPressed: () {
+                  setState(() {
+                    _selectedFilters = List.from(tempSelectedFilters);
+                  });
                   _applyFilter();
                   Navigator.pop(context); // Close the bottom sheet
                 },
