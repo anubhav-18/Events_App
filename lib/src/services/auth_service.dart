@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cu_events/src/User_UI/onboarding_screen.dart';
+import 'package:cu_events/src/UI/User_UI/onboarding_screen.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/models/user_model.dart';

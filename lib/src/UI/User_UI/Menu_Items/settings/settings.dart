@@ -1,5 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:cu_events/src/User_UI/Menu_Items/settings/reset_password.dart';
+import 'package:cu_events/src/UI/User_UI/Menu_Items/settings/reset_password.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/controller/notification.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';

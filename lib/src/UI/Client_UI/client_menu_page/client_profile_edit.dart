@@ -1,4 +1,4 @@
-import 'package:cu_events/src/Client_UI/client_menu_page.dart';
+import 'package:cu_events/src/UI/Client_UI/client_menu_page.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/client_model.dart';
 import 'package:cu_events/src/reusable_widget/custom_button.dart';

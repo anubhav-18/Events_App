@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:cu_events/src/User_UI/login/logout_dialog.dart';
+import 'package:cu_events/src/UI/User_UI/login/logout_dialog.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/user_model.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';

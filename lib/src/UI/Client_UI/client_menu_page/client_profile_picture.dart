@@ -1,5 +1,5 @@
-import 'package:cu_events/src/Client_UI/client_menu_page.dart';
-import 'package:cu_events/src/User_UI/home/home_sections/menu_page_section.dart';
+import 'package:cu_events/src/UI/Client_UI/client_menu_page.dart';
+import 'package:cu_events/src/UI/User_UI/home/home_sections/menu_page_section.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/client_model.dart';
 import 'package:cu_events/src/services/auth_service.dart';

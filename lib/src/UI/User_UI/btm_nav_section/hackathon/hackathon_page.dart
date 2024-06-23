@@ -29,8 +29,8 @@
 //     ),
 //   ];
 
-import 'package:cu_events/src/User_UI/btm_nav_section/hackathon/filter_hackathon.dart';
-import 'package:cu_events/src/User_UI/btm_nav_section/hackathon/hackathon_card.dart';
+import 'package:cu_events/src/UI/User_UI/btm_nav_section/hackathon/filter_hackathon.dart';
+import 'package:cu_events/src/UI/User_UI/btm_nav_section/hackathon/hackathon_card.dart';
 import 'package:cu_events/src/models/hackathon_model.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:flutter/material.dart';
