@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cu_events/src/models/client_model.dart';
 import 'package:cu_events/src/models/comment_model.dart';
 import 'package:cu_events/src/models/event_model.dart';
 import 'package:cu_events/src/models/hackathon_model.dart';
@@ -25,6 +26,14 @@ class FirestoreService {
                 imageUrl: data['imageUrl'],
               );
             }).toList());
+  }
+
+  Future<void> updateClientDetails(ClientModel client) async {
+    try {
+      await _db.collection('clients').doc(client.id).update(client.toFirestore());
+    } catch (e) {
+      throw Exception('Failed to update client details: $e');
+    }
   }
 
   // fetch the featured evetns on the bsis of tags and other crietria
@@ -344,17 +353,29 @@ class FirestoreService {
       if (snapshot.exists) {
         return UserModel.fromFirestore(
             snapshot.data() as Map<String, dynamic>, snapshot.id);
-        // UserModel(
-        //   id: uid,
-        //   firstName: snapshot.get('firstName'),
-        //   lastName: snapshot.get('lastName'),
-        //   email: snapshot.get('email'),
-        // );
       } else {
         return null; // User document not found
       }
     } catch (e) {
       print('Error getting user details: $e');
+      return null;
+    }
+  }
+
+  // Client Details Fetch From Firebase
+  Future<ClientModel?> getClientDetails(String clientId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> docSnapshot =
+          await _db.collection('clients').doc(clientId).get();
+
+      if (docSnapshot.exists) {
+        ClientModel client = ClientModel.fromFirestore(docSnapshot);
+        return client;
+      } else {
+        return null; // Client document not found
+      }
+    } catch (e) {
+      print('Error fetching client details: $e');
       return null;
     }
   }

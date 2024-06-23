@@ -1,33 +1,34 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:cu_events/src/UI/Menu_Items/about_us.dart';
-import 'package:cu_events/src/UI/Menu_Items/faq.dart';
-import 'package:cu_events/src/UI/btm_nav_section/favourite.dart';
-import 'package:cu_events/src/UI/Menu_Items/feedback.dart';
-import 'package:cu_events/src/UI/Menu_Items/invite_friends.dart';
-import 'package:cu_events/src/UI/Menu_Items/privacy_policy.dart';
-import 'package:cu_events/src/UI/Menu_Items/settings/reset_password.dart';
-import 'package:cu_events/src/UI/Menu_Items/settings/settings.dart';
-import 'package:cu_events/src/UI/Menu_Items/terms_of_service.dart';
-import 'package:cu_events/src/UI/Menu_Items/your_profile.dart';
-import 'package:cu_events/src/UI/client_side/client_dashboard.dart';
-import 'package:cu_events/src/UI/client_side/client_info.dart';
-import 'package:cu_events/src/UI/client_side/client_resetpass.dart';
-import 'package:cu_events/src/UI/home/home_sections/btm_nav_bar.dart';
-import 'package:cu_events/src/UI/home/home_sections/search_view.dart';
-import 'package:cu_events/src/UI/splashscreen/splashscreen.dart';
+import 'package:cu_events/src/Client_UI/client_menu_page/client_profile_edit.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/about_us.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/faq.dart';
+import 'package:cu_events/src/User_UI/btm_nav_section/favourite.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/feedback.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/invite_friends.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/privacy_policy.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/settings/reset_password.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/settings/settings.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/terms_of_service.dart';
+import 'package:cu_events/src/User_UI/Menu_Items/your_profile.dart';
+import 'package:cu_events/src/Client_UI/client_dashboard.dart';
+import 'package:cu_events/src/Client_UI/client_login/client_info.dart';
+import 'package:cu_events/src/Client_UI/client_login/client_resetpass.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/btm_nav_bar.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/search_view.dart';
+import 'package:cu_events/src/User_UI/splashscreen/splashscreen.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/controller/network_contoller.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';
 import 'package:cu_events/src/provider/search_provider.dart';
 import 'package:cu_events/src/services/auth_service.dart';
-import 'package:cu_events/src/UI/events/all_events.dart';
-import 'package:cu_events/src/UI/events/events_details.dart';
+import 'package:cu_events/src/User_UI/events/all_events.dart';
+import 'package:cu_events/src/User_UI/events/events_details.dart';
 import 'package:cu_events/firebase_options.dart';
-import 'package:cu_events/src/UI/home/homepage.dart';
+import 'package:cu_events/src/User_UI/home/homepage.dart';
 import 'package:cu_events/src/controller/notification.dart';
-import 'package:cu_events/src/UI/login/create_account.dart';
-import 'package:cu_events/src/UI/login/forget_password.dart';
-import 'package:cu_events/src/UI/login/login_screen.dart';
+import 'package:cu_events/src/User_UI/login/create_account.dart';
+import 'package:cu_events/src/User_UI/login/forget_password.dart';
+import 'package:cu_events/src/User_UI/login/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -178,6 +179,7 @@ class _MyAppState extends State<MyApp> {
         '/clientInfo': (context) => const ClientInfo(),
         '/clientDashboard': (context) => const ClientDashboard(),
         '/clientresetpass': (context) => const ClientResetpass(),
+        '/clientProfile': (context) => const EditClientProfilePage(),
       },
     );
   }

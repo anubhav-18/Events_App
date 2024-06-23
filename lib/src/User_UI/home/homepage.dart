@@ -1,25 +1,23 @@
 import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cu_events/src/UI/home/home_sections/ongoing_section.dart';
-import 'package:cu_events/src/UI/home/home_sections/feautred_event_section.dart';
-import 'package:cu_events/src/UI/home/home_sections/profile_picture.dart';
-import 'package:cu_events/src/UI/home/home_sections/recommeded_events.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/ongoing_section.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/feautred_event_section.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/profile_picture.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/recommeded_events.dart';
 import 'package:cu_events/src/models/user_model.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/event_model.dart';
-import 'package:cu_events/src/UI/home/home_sections/search_view.dart';
-import 'package:cu_events/src/UI/home/home_sections/upcoming_event_section.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/search_view.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/upcoming_event_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Homepage extends StatefulWidget {
-  final UserModel? updatedUser;
   const Homepage({
     super.key,
-    this.updatedUser,
   });
 
   @override
@@ -45,7 +43,6 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     _fetchEvents();
-    _userModel = widget.updatedUser;
     _getUserId();
   }
 

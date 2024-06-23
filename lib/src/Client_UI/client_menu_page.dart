@@ -1,10 +1,6 @@
-import 'dart:io';
-import 'package:cu_events/src/UI/login/logout_dialog.dart';
 import 'package:cu_events/src/constants.dart';
-import 'package:cu_events/src/models/user_model.dart';
-import 'package:cu_events/src/provider/favourite_provider.dart';
+import 'package:cu_events/src/models/client_model.dart';
 import 'package:cu_events/src/reusable_widget/custom_listtile.dart';
-import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,43 +9,39 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class MenuPage extends StatefulWidget {
-  final UserModel? updatedUser;
-  const MenuPage({
-    super.key,
+class ClientMenuPage extends StatefulWidget {
+  final ClientModel? updatedUser;
+  const ClientMenuPage({
+    Key? key,
     this.updatedUser,
-  });
+  }) : super(key: key);
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<ClientMenuPage> createState() => _ClientMenuPageState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _ClientMenuPageState extends State<ClientMenuPage> {
   bool _isLoading = true;
-  UserModel? _userModel;
+  final _auth = AuthService();
+  ClientModel? _clientModel;
+  final FirestoreService _firestoreService = FirestoreService();
 
   @override
   void initState() {
     super.initState();
-    _userModel = widget.updatedUser;
-    _fetchUserDetails();
+    _fetchClientDetails();
   }
 
-  Future<void> _fetchUserDetails() async {
-    final _auth = Provider.of<AuthService>(context, listen: false);
+  Future<void> _fetchClientDetails() async {
     final user = _auth.user;
-    final FirestoreService _firestoreService = FirestoreService();
 
     try {
       final userData = await user.first;
       if (userData != null) {
-        // Check if userData is not null
-        _userModel = await _firestoreService.getUserDetails(userData.uid);
+        _clientModel = await _firestoreService.getClientDetails(userData.uid);
       }
     } catch (e) {
-      // Handle errors here (e.g., show error message)
       print('Error fetching user details: $e');
     } finally {
       setState(() {
@@ -66,8 +58,8 @@ class _MenuPageState extends State<MenuPage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           // User is logged in, fetch user details from Firestore
-          return FutureBuilder<UserModel?>(
-            future: FirestoreService().getUserDetails(snapshot.data!.uid),
+          return FutureBuilder<ClientModel?>(
+            future: FirestoreService().getClientDetails(snapshot.data!.uid),
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
                 // Show shimmer while fetching user details
@@ -78,8 +70,8 @@ class _MenuPageState extends State<MenuPage> {
                   title: Text('Error: ${userSnapshot.error}'),
                 );
               } else {
-                final userModel = userSnapshot.data;
-                return _buildLoggedInHeader(context, userModel);
+                final clientmodel = userSnapshot.data;
+                return _buildLoggedInHeader(context, clientmodel);
               }
             },
           );
@@ -125,7 +117,7 @@ class _MenuPageState extends State<MenuPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hey, CUIANS',
+                  'Hey, Client',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ],
@@ -179,7 +171,7 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Widget _buildLoggedInHeader(BuildContext context, UserModel? userModel) {
+  Widget _buildLoggedInHeader(BuildContext context, ClientModel? clientModel) {
     return Container(
       margin: const EdgeInsets.all(10.0),
       padding:
@@ -198,12 +190,12 @@ class _MenuPageState extends State<MenuPage> {
       ),
       child: Row(
         children: [
-          if (_userModel != null ) ...[
+          if (_clientModel != null) ...[
             CircleAvatar(
               radius: 35,
               backgroundColor: primaryBckgnd,
-              child: Text("A",
-                // userModel?.firstName[0].toUpperCase() ?? 'U',
+              child: Text(
+                clientModel!.name[0].toUpperCase(),
                 style: const TextStyle(fontSize: 32, color: Colors.white),
               ),
             ),
@@ -212,7 +204,7 @@ class _MenuPageState extends State<MenuPage> {
               radius: 35,
               backgroundColor: primaryBckgnd,
               child: Text(
-                userModel?.firstName[0].toUpperCase() ?? 'U',
+                'G',
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
@@ -223,11 +215,11 @@ class _MenuPageState extends State<MenuPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  userModel?.firstName ?? 'User',
+                  clientModel!.name, // Replace with client name
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 Text(
-                  userModel?.email ?? '',
+                  clientModel.email, // Replace with client email or other info
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall!
@@ -244,8 +236,6 @@ class _MenuPageState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     const double uniformPadding = 8.0;
-    final AuthService _auth = Provider.of<AuthService>(context, listen: false);
-    final favoriteProvider = Provider.of<FavoriteProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -262,8 +252,8 @@ class _MenuPageState extends State<MenuPage> {
                 pinned: true,
                 floating: false,
                 delegate: _SliverAppBarDelegate(
-                  minHeight: _auth.currentUser != null ? 190 : 185.0,
-                  maxHeight: _auth.currentUser != null ? 190 : 185.0,
+                  minHeight: 186.0,
+                  maxHeight: 186.0,
                   child: Container(
                     color: Colors.grey[50],
                     child: Column(
@@ -289,64 +279,39 @@ class _MenuPageState extends State<MenuPage> {
                     [
                       CustomListTileGroup(
                         tiles: [
-                          if (_auth.currentUser != null) ...[
-                            menuListTile(
-                              'Your Profile',
-                              () {
-                                Navigator.pushNamed(context, '/yourprofile');
-                              },
-                              'assets/icons/categories/profile.svg',
-                            ),
-                          ] else ...[
-                            menuListTile(
-                              'Login',
-                              () {
-                                Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  '/login',
-                                  (Route<dynamic> route) => false,
-                                );
-                              },
-                              'assets/icons/categories/login.svg',
-                            )
-                          ]
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      CustomListTileGroup(
-                        tiles: [
                           menuListTile(
-                            'Rate Us',
-                            () async {
-                              if (Platform.isAndroid) {
-                                await launchUrl(
-                                  Uri.parse(
-                                      "https://play.google.com/store/apps/details?id=com.yourapp.id"),
-                                );
-                              } else if (Platform.isIOS) {
-                                await launchUrl(
-                                  Uri.parse(
-                                      "https://apps.apple.com/app/idYOUR_APP_ID"),
-                                );
-                              }
+                            'Your Profile',
+                            () {
+                              Navigator.pushNamed(context, '/clientProfile');
                             },
-                            'assets/icons/categories/rateus.svg',
+                            'assets/icons/categories/profile.svg',
                           ),
                         ],
                       ),
                       const SizedBox(height: 20),
                       CustomListTileGroup(
-                        header: 'Discover', // Optional header
+                        header: 'Discover',
                         tiles: [
+                          // Client-specific menu tiles
                           menuListTile(
-                            'Home',
-                            () => Navigator.of(context).pushNamed('/home'),
-                            'assets/icons/categories/home.svg',
+                            'Add Event', 
+                            () {},
+                            'assets/icons/categories/login.svg',
                           ),
                           menuListTile(
-                            'All Events',
-                            () => Navigator.of(context).pushNamed('/allevents'),
-                            'assets/icons/categories/all_events.svg',
+                            'Update Event', 
+                            () {},
+                            'assets/icons/categories/login.svg',
+                          ),
+                          menuListTile(
+                            'Delete Event',
+                            () {},
+                            'assets/icons/categories/login.svg',
+                          ),
+                          menuListTile(
+                            'Analytics',
+                            () {},
+                            'assets/icons/categories/login.svg',
                           ),
                         ],
                       ),
@@ -389,53 +354,17 @@ class _MenuPageState extends State<MenuPage> {
                       ),
                       const SizedBox(height: 20),
                       CustomListTileGroup(
-                        header: 'More', // Optional header
+                        header: 'More', 
                         tiles: [
                           menuListTile(
-                            'Settings',
-                            () => Navigator.of(context).pushNamed('/settings'),
-                            'assets/icons/categories/settings.svg',
+                            'Log Out',
+                            () => {
+                              _auth.signOut(),
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/login', (route) => false),
+                            },
+                            'assets/icons/categories/logout.svg',
                           ),
-                          menuListTile(
-                            'Invite Friends',
-                            () => Navigator.of(context).pushNamed('/invite'),
-                            'assets/icons/categories/edit.svg',
-                          ),
-                          if (_auth.currentUser != null) ...[
-                            menuListTile(
-                              'Log Out',
-                              () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => LogoutDialog(
-                                    onLogout: () async {
-                                      await _auth.signOut();
-                                      FirebaseAuth.instance
-                                          .authStateChanges()
-                                          .listen((User? user) {
-                                        if (user == null) {
-                                          // User logged out
-                                          // Reset favorite provider or clear favorites
-                                          favoriteProvider.clearFavorites();
-                                        } else {
-                                          // User logged in
-                                          favoriteProvider.updateUser(user);
-                                        }
-                                      });
-                                      showCustomSnackBar(
-                                          context, 'Successfully Logged Out');
-                                      Navigator.pushNamedAndRemoveUntil(
-                                        context,
-                                        '/login',
-                                        (Route<dynamic> route) => false,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                              'assets/icons/categories/logout.svg',
-                            ),
-                          ]
                         ],
                       ),
                     ],

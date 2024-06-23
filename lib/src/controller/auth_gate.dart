@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cu_events/src/UI/login/login_screen.dart';
-import 'package:cu_events/src/UI/onboarding_screen.dart';
+import 'package:cu_events/src/User_UI/login/login_screen.dart';
+import 'package:cu_events/src/User_UI/onboarding_screen.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
 import 'package:cu_events/src/services/auth_service.dart';

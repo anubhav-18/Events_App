@@ -1,7 +1,7 @@
-import 'package:cu_events/src/UI/btm_nav_section/favourite.dart';
-import 'package:cu_events/src/UI/btm_nav_section/hackathon/hackathon_add.dart';
-import 'package:cu_events/src/UI/btm_nav_section/hackathon/hackathon_page.dart';
-import 'package:cu_events/src/UI/home/homepage.dart';
+import 'package:cu_events/src/User_UI/btm_nav_section/favourite.dart';
+import 'package:cu_events/src/User_UI/btm_nav_section/hackathon/hackathon_add.dart';
+import 'package:cu_events/src/User_UI/btm_nav_section/hackathon/hackathon_page.dart';
+import 'package:cu_events/src/User_UI/home/homepage.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

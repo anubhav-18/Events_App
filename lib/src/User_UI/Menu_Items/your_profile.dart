@@ -1,4 +1,4 @@
-import 'package:cu_events/src/UI/home/home_sections/menu_page_section.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/menu_page_section.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/user_model.dart';
 import 'package:cu_events/src/reusable_widget/custom_button.dart';
@@ -126,7 +126,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         );
       } catch (e) {
-        showCustomSnackBar(context, 'Failed to update profile: $e');
+        showCustomSnackBar(context, 'Failed to update profile');
         print(e);
       } finally {
         setState(() {

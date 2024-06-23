@@ -1,54 +1,53 @@
-import 'package:cu_events/src/UI/home/home_sections/menu_page_section.dart';
+import 'package:cu_events/src/Client_UI/client_menu_page.dart';
+import 'package:cu_events/src/User_UI/home/home_sections/menu_page_section.dart';
 import 'package:cu_events/src/constants.dart';
-import 'package:cu_events/src/models/user_model.dart';
+import 'package:cu_events/src/models/client_model.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ProfilePicture extends StatefulWidget {
-  final UserModel? updatedUser;
-  const ProfilePicture({super.key, this.updatedUser});
+class ClientProfilePicture extends StatefulWidget {
+  final ClientModel? updatedClient;
+  const ClientProfilePicture({Key? key, this.updatedClient}) : super(key: key);
 
   @override
-  State<ProfilePicture> createState() => _ProfilePictureState();
+  State<ClientProfilePicture> createState() => _ClientProfilePictureState();
 }
 
-class _ProfilePictureState extends State<ProfilePicture> {
+class _ClientProfilePictureState extends State<ClientProfilePicture> {
   bool _isLoading = true;
-  UserModel? _userModel;
-  TextEditingController _firstNameController = TextEditingController();
+  ClientModel? _clientModel;
+  TextEditingController _nameController = TextEditingController();
   final FirestoreService _firestoreService = FirestoreService();
   final AuthService _auth = AuthService();
 
   @override
   void initState() {
     super.initState();
-    _fetchUserDetails();
-    _userModel = widget.updatedUser;
+    _fetchClientDetails();
+    _clientModel = widget.updatedClient;
   }
 
-  Future<void> _fetchUserDetails() async {
+  Future<void> _fetchClientDetails() async {
     try {
       final user = _auth.currentUser;
-
-      // final userData = await user.first;
       if (user != null) {
-        UserModel? userModel = await _firestoreService.getUserDetails(user.uid);
-        if (userModel != null && mounted) {
+        ClientModel? clientModel =
+            await _firestoreService.getClientDetails(user.uid);
+        if (clientModel != null && mounted) {
           setState(() {
-            _userModel = userModel;
-            _firstNameController =
-                TextEditingController(text: userModel.firstName);
+            _clientModel = clientModel;
+            _nameController = TextEditingController(text: clientModel.name);
             _isLoading = false;
           });
         }
       }
     } catch (e) {
       // Handle errors here (e.g., show error message)
-      print('Error fetching user details: $e');
+      print('Error fetching client details: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -59,32 +58,27 @@ class _ProfilePictureState extends State<ProfilePicture> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final user = _auth.user;
     return StreamBuilder<User?>(
       stream: user,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          // User is logged in, fetch user details from Firestore
-          return FutureBuilder<UserModel?>(
-            future: FirestoreService().getUserDetails(snapshot.data!.uid),
-            builder: (context, userSnapshot) {
-              if (userSnapshot.connectionState == ConnectionState.waiting) {
-                // Show shimmer while fetching user details
+          // User is logged in, fetch client details from Firestore
+          return FutureBuilder<ClientModel?>(
+            future: _firestoreService.getClientDetails(snapshot.data!.uid),
+            builder: (context, clientSnapshot) {
+              if (clientSnapshot.connectionState == ConnectionState.waiting) {
+                // Show shimmer while fetching client details
                 return _profileShimmer();
-              } else if (userSnapshot.hasError) {
+              } else if (clientSnapshot.hasError) {
                 // Show error message
                 return ListTile(
-                  title: Text('Error: ${userSnapshot.error}'),
+                  title: Text('Error: ${clientSnapshot.error}'),
                 );
               } else {
-                final userModel = userSnapshot.data;
-                return _profilePicture(context, userModel);
+                final clientModel = clientSnapshot.data;
+                return _profilePicture(context, clientModel);
               }
             },
           );
@@ -96,12 +90,12 @@ class _ProfilePictureState extends State<ProfilePicture> {
     );
   }
 
-  Widget _profilePicture(BuildContext context, UserModel? userModel) {
+  Widget _profilePicture(BuildContext context, ClientModel? clientModel) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-              const MenuPage(),
+              const ClientMenuPage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             var begin = const Offset(1.0, 0.0);
             var end = Offset.zero;
@@ -124,14 +118,14 @@ class _ProfilePictureState extends State<ProfilePicture> {
           radius: 18,
           backgroundColor: whiteColor,
           child: Text(
-                  _firstNameController.text.isNotEmpty
-                      ? _firstNameController.text[0].toUpperCase()
-                      : '',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: Colors.black),
-                ),
+            _nameController.text.isNotEmpty
+                ? _nameController.text[0].toUpperCase()
+                : '',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Colors.black),
+          ),
         ),
       ),
     );
