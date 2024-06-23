@@ -31,7 +31,6 @@
 
 import 'package:cu_events/src/UI/btm_nav_section/hackathon/filter_hackathon.dart';
 import 'package:cu_events/src/UI/btm_nav_section/hackathon/hackathon_card.dart';
-import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/hackathon_model.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:flutter/material.dart';
@@ -178,8 +177,8 @@ class _HackathonsPageState extends State<HackathonsPage> {
       
                   // Apply sorting
                   if (_selectedSortBy == 'Date') {
-                    filteredHackathons.sort((a, b) => a.daysLeft!.compareTo(
-                        b.daysLeft!)); // Adjust sorting logic as needed
+                    filteredHackathons.sort((a, b) => a.daysLeft.compareTo(
+                        b.daysLeft)); // Adjust sorting logic as needed
                   } else if (_selectedSortBy == 'Popularity') {
                     // Implement popularity sorting logic if needed
                   }
@@ -205,7 +204,7 @@ class _HackathonsPageState extends State<HackathonsPage> {
       return false;
     }
     if (_selectedCategory != null &&
-        !hackathon.categories!.contains(_selectedCategory!)) {
+        !hackathon.categories.contains(_selectedCategory!)) {
       return false;
     }
     if (_liveOnly && hackathon.status != 'Live') {

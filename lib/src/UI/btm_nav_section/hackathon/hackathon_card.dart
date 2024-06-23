@@ -86,7 +86,6 @@ class HackathonCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 // Registered Participants (if available)
-                if (hackathon.registered != null)
                   Row(
                     children: [
                       const Icon(Icons.people_outline),

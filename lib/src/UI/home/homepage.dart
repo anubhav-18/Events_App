@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,7 +30,6 @@ class _HomepageState extends State<Homepage> {
   final CarouselController _carouselController = CarouselController();
 
   final FirestoreService _firestoreService = FirestoreService();
-  List<EventModel> _popularEvents = [];
   List<EventModel> _upcomingEvents = [];
   List<EventModel> _ongoingEvents = [];
   List<EventModel> _filteredEvents = [];
