@@ -1,4 +1,5 @@
 import 'package:cu_events/src/constants.dart';
+import 'package:cu_events/src/controller/auth_gate.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/reusable_widget/custom_button.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
@@ -24,9 +25,18 @@ class _LoginScreenState extends State<LoginScreen> {
   String? error;
 
   void _stopLoading() {
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -128,7 +138,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               // Google Sign-In Button
                               GoogleSignInButton(
                                 onPressed: () async {
-                                  setState(() => _isLoading = true);
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
                                   try {
                                     await _auth.signInWithGoogle(context);
                                   } catch (e) {
@@ -166,20 +178,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (_formKey.currentState!.validate()) {
                                   setState(() => _isLoading = true);
                                   try {
-                                    dynamic result =
-                                        await _auth.signInWithEmailAndPassword(
+                                    UserCredential? result =
+                                        await _auth.loginWithEmailAndPassword(
                                             _emailController.text,
-                                            _passwordController.text);
+                                            _passwordController.text,
+                                            context);
                                     if (result == null) {
-                                      showCustomSnackBar(
-                                        context,
-                                        'Could not sign in. Please check your credentials.',
-                                      );
+                                      // showCustomSnackBar(
+                                      //   context,
+                                      //   'Could not sign in. Please check your credentials.',
+                                      // );
                                     } else {
-                                      showCustomSnackBar(
-                                          context, 'Welcome to CU Events');
-                                      Navigator.pushReplacementNamed(
-                                          context, '/home');
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AuthGate(),
+                                        ),
+                                      );
                                     }
                                   } catch (e) {
                                     if (e is FirebaseAuthException) {
@@ -188,11 +204,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                           .toString();
                                       showCustomSnackBar(context, errorMessage);
                                     } else {
-                                      showCustomSnackBar(context,
-                                          'An unexpected error occurred. Please try again.');
+                                      // showCustomSnackBar(context,
+                                      //     'An unexpected error occurred. Please try again.');
                                     }
                                   } finally {
-                                    setState(() => _isLoading = false);
+                                    if (mounted) {
+                                      setState(
+                                        () => _isLoading = false,
+                                      ); // Always stop loading
+                                    }
                                   }
                                 }
                               },

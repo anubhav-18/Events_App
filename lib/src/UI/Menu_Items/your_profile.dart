@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cu_events/src/UI/home/home_sections/menu_page_section.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/user_model.dart';
@@ -9,10 +8,7 @@ import 'package:cu_events/src/reusable_widget/custom_textfiled.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -31,9 +27,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _dobController;
   String? _selectedGender;
   DateTime? _selectedDateOfBirth;
-  File? _image;
   bool _isLoading = true;
-  String? _imageUrl;
   UserModel? _userModel;
   bool _isEdited = false;
 
@@ -71,7 +65,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 text: userModel.dateOfBirth != null
                     ? DateFormat('yyyy-MM-dd').format(userModel.dateOfBirth!)
                     : '');
-            _imageUrl = userModel.profilePicture;
             _isLoading = false; // Data loaded, stop the loading state
           });
         }
@@ -106,11 +99,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       });
 
       try {
-        String? imageUrl = _imageUrl;
-        if (_image != null) {
-          imageUrl = await _uploadImageToFirebase(_image!);
-        }
-
         UserModel? latestUserData =
             await _firestoreService.getUserDetails(_userModel!.id);
 
@@ -122,7 +110,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           phoneNo: _phoneController.text,
           gender: _selectedGender,
           dateOfBirth: _selectedDateOfBirth ?? latestUserData?.dateOfBirth,
-          profilePicture: imageUrl,
+          interests: [],
         );
 
         await _firestoreService.updateUserDetails(updatedUser);
@@ -148,31 +136,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  Future<void> _selectImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _image = File(image.path);
-        _isEdited = true;
-      });
-    }
-  }
-
-  Future<String?> _uploadImageToFirebase(File image) async {
-    try {
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final ref =
-          FirebaseStorage.instance.ref().child('profile_images/$fileName');
-      final uploadTask = ref.putFile(image);
-      final snapshot = await uploadTask.whenComplete(() {});
-      return await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      print('Error uploading image: $e');
-      return null;
-    }
-  }
-
   Widget _buildProfilePicture() {
     return Center(
       child: Stack(
@@ -182,141 +145,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
           CircleAvatar(
             radius: 60,
             backgroundColor: primaryBckgnd,
-            backgroundImage: _image != null
-                ? FileImage(_image!) as ImageProvider
-                : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
-            child: (_image == null && _imageUrl == null)
-                ? Text(
-                    _firstNameController.text.isNotEmpty
-                        ? _firstNameController.text[0].toUpperCase()
-                        : '',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  )
-                : null,
-          ),
-          // Edit Icon with BottomSheet
-          Card(
-            elevation: 4,
-            child: InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext bc) {
-                    return _buildBottomSheet(context);
-                  },
-                );
-              },
-              child: CircleAvatar(
-                radius: 15,
-                backgroundColor: Colors.white,
-                child: SvgPicture.asset(
-                  'assets/icons/categories/edit.svg',
-                  width: 17,
-                  height: 17,
-                ),
+            child: Text(
+              _firstNameController.text.isNotEmpty
+                  ? _firstNameController.text[0].toUpperCase()
+                  : '',
+              style: GoogleFonts.montserrat(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomSheet(BuildContext context) {
-    return Container(
-      // height: 170, // Adjust height as needed
-      decoration: const BoxDecoration(
-        color: backgndColor, // Use your background color
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Wrap(
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          ListTile(
-            dense: true,
-            leading: CircleAvatar(
-              radius: 17,
-              backgroundColor: Colors.grey.withOpacity(0.2),
-              child: SvgPicture.asset(
-                'assets/icons/categories/change_picture.svg',
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.6), BlendMode.srcIn),
-              ),
-            ),
-            title: Text(
-              'Change Picture',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            onTap: () {
-              Navigator.pop(context); // Close the bottom sheet
-              _selectImage();
-            },
-          ),
-          const Divider(
-            thickness: 1,
-            color: Colors.black,
-          ),
-          ListTile(
-            dense: true,
-            leading: CircleAvatar(
-              radius: 17,
-              backgroundColor: Colors.grey.withOpacity(0.2),
-              child: SvgPicture.asset(
-                'assets/icons/categories/delete.svg',
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.6), BlendMode.srcIn),
-              ),
-            ),
-            title: Text(
-              'Delete Picture',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            onTap: () {
-              Navigator.pop(context); // Close the bottom sheet
-              setState(() {
-                _image = null;
-                _imageUrl = null;
-                _isEdited = true;
-              });
-            },
-          ),
-          const Divider(
-            thickness: 1,
-            color: Colors.black,
-          ),
-          ListTile(
-            dense: true,
-            leading: CircleAvatar(
-              radius: 17,
-              backgroundColor: Colors.grey.withOpacity(0.2),
-              child: SvgPicture.asset(
-                'assets/icons/categories/cancel.svg',
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.6), BlendMode.srcIn),
-              ),
-            ),
-            title: Text(
-              'Cancel',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
           ),
         ],
       ),

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cu_events/src/UI/home/home_sections/menu_page_section.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/user_model.dart';
@@ -21,8 +20,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
   bool _isLoading = true;
   UserModel? _userModel;
   TextEditingController _firstNameController = TextEditingController();
-  File? _image;
-  String? _imageUrl;
   final FirestoreService _firestoreService = FirestoreService();
   final AuthService _auth = AuthService();
 
@@ -45,7 +42,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
             _userModel = userModel;
             _firstNameController =
                 TextEditingController(text: userModel.firstName);
-            _imageUrl = userModel.profilePicture;
             _isLoading = false;
           });
         }
@@ -54,9 +50,11 @@ class _ProfilePictureState extends State<ProfilePicture> {
       // Handle errors here (e.g., show error message)
       print('Error fetching user details: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -125,11 +123,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
         child: CircleAvatar(
           radius: 18,
           backgroundColor: whiteColor,
-          backgroundImage: _image != null
-              ? FileImage(_image!) as ImageProvider
-              : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
-          child: (_image == null && _imageUrl == null)
-              ? Text(
+          child: Text(
                   _firstNameController.text.isNotEmpty
                       ? _firstNameController.text[0].toUpperCase()
                       : '',
@@ -137,8 +131,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
                       .textTheme
                       .bodyMedium!
                       .copyWith(color: Colors.black),
-                )
-              : null,
+                ),
         ),
       ),
     );

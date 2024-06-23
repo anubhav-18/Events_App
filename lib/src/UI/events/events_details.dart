@@ -2,15 +2,18 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cu_events/src/constants.dart';
+import 'package:cu_events/src/models/comment_model.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';
 import 'package:cu_events/src/reusable_widget/cachedImage.dart';
 import 'package:cu_events/src/controller/notification.dart';
 import 'package:cu_events/src/reusable_widget/custom_snackbar.dart';
+import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cu_events/src/models/event_model.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +38,12 @@ class _EventDetailsPageState extends State<EventDetailsPage>
   late AnimationController _animationController;
   late AnimationController _controllerWishList;
   final user = FirebaseAuth.instance.currentUser;
-  bool _isLoading = false;
+
+  final FirestoreService _firestoreService = FirestoreService();
+  double _userRating = 0.0;
+  List<CommentModel> _comments = []; // List to store comments
+  final TextEditingController _commentController = TextEditingController();
+  EventModel? event;
 
   @override
   void initState() {
@@ -48,6 +56,43 @@ class _EventDetailsPageState extends State<EventDetailsPage>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is EventModel) {
+        setState(() {
+          event = args;
+          _fetchComments(); // Call _fetchComments here
+          _getUserRating();
+        });
+      } else {
+        // Handle the case where the event was not passed correctly.
+        // You could navigate back or show an error message.
+      }
+    });
+  }
+
+  Future<void> _getUserRating() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final rating =
+          await _firestoreService.getUserRatingForEvent(user.uid, event!.id);
+      if (rating != null) {
+        setState(() {
+          _userRating = rating;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchComments() async {
+    try {
+      final comments = await _firestoreService.getCommentsForEvent(event!.id);
+      setState(() {
+        _comments = comments;
+      });
+    } catch (e) {
+      print('Error fetching comments: $e');
+    }
   }
 
   void _toggleFAB() {
@@ -154,7 +199,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           throw Exception('File does not exist');
         }
       } catch (e) {
-        showCustomSnackBar(context, 'Error sharing event: $e');
+        showCustomSnackBar(context, 'Error sharing event');
         print(e);
       }
     }
@@ -185,8 +230,13 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     }
 
     Widget _buildDetailRow(
-        BuildContext context, String iconAssetPath, String label, String value,
-        {VoidCallback? onTap}) {
+      BuildContext context,
+      String iconAssetPath,
+      String label, {
+      String? value,
+      Widget? customWidget,
+      VoidCallback? onTap,
+    }) {
       return GestureDetector(
         onTap: onTap,
         child: Padding(
@@ -209,15 +259,123 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           color: primaryBckgnd, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      value,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    customWidget ??
+                        Text(
+                          value ?? '',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        )
                   ],
                 ),
               ),
             ],
           ),
+        ),
+      );
+    }
+
+    Widget _buildCommentsList() {
+      return _comments.isEmpty
+          ? const Center(child: Text('No comments yet'))
+          : ListView.builder(
+              shrinkWrap: true, // Important for nested ListViews
+              physics:
+                  const NeverScrollableScrollPhysics(), // Disable scrolling in nested ListView
+              itemCount: _comments.length,
+              itemBuilder: (context, index) {
+                final comment = _comments[index];
+                final formattedTimestamp = DateFormat('MMM d, yyyy - hh:mm a')
+                    .format(comment.timestamp);
+                return ListTile(
+                  title: Text(comment.text),
+                  subtitle: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('By ${comment.authorName}'),
+                      Text(formattedTimestamp),
+                    ],
+                  ),
+                );
+              },
+            );
+    }
+
+    Widget _buildCommentInput() {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _commentController,
+                decoration: const InputDecoration(hintText: 'Add a comment'),
+              ),
+            ),
+            IconButton(
+              onPressed: () async {
+                if (_commentController.text.isNotEmpty) {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    final comment = CommentModel(
+                      id: '', // Firestore will generate an ID
+                      eventId: event.id,
+                      authorName: user.displayName ?? 'Anonymous',
+                      text: _commentController.text,
+                      timestamp: DateTime
+                          .now(), // You can use server timestamp as well
+                    );
+                    await _firestoreService.addCommentToEvent(
+                        event.id, comment);
+                    _commentController.clear(); // Clear the input field
+                    _fetchComments(); // Refresh comments
+                  } else {
+                    // Handle case where the user is not logged in
+                  }
+                }
+              },
+              icon: const Icon(Icons.send),
+            ),
+          ],
+        ),
+      );
+    }
+
+    void _searchByTag(BuildContext context, String tag) {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context, tag);
+      }
+
+      Navigator.pushNamed(context, '/search', arguments: tag);
+    }
+
+    Widget _buildTagsRow(BuildContext context, List<String> tags) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/tags.svg', // Assuming you have a tag icon
+              height: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Wrap(
+                spacing: 8.0,
+                children: tags.map((tag) {
+                  return ActionChip(
+                    // Use ActionChip for clickable tags
+                    label: Text(tag),
+                    backgroundColor: whiteColor,
+                    labelStyle: const TextStyle(color: primaryBckgnd),
+                    onPressed: () {
+                      _searchByTag(context, tag); // Call the search function
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -348,18 +506,22 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Title and Tags
                                   Text(
-                                    'Description',
+                                    event.title,
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineMedium!
-                                        .copyWith(color: primaryBckgnd),
+                                        .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: primaryBckgnd),
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    event.description,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                                  const SizedBox(height: 20),
+                                  _buildDetailRow(
+                                    context,
+                                    'assets/icons/description.svg',
+                                    'Description',
+                                    value: event.description,
                                   ),
                                   const Divider(
                                     height: 32,
@@ -370,14 +532,14 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     context,
                                     'assets/icons/calendar.svg',
                                     'Date:',
-                                    DateFormat('EEEE, MMM d, yyyy')
+                                    value: DateFormat('EEEE, MMM d, yyyy')
                                         .format(event.startdate!),
                                   ),
                                   _buildDetailRow(
                                     context,
                                     'assets/icons/clock.svg',
                                     'Time:',
-                                    DateFormat('h:mm a')
+                                    value: DateFormat('h:mm a')
                                         .format(event.startdate!),
                                   ),
                                   const Divider(
@@ -390,7 +552,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                       context,
                                       'assets/icons/link.svg',
                                       'Registration Link:',
-                                      event.link,
+                                      value: event.link,
                                       onTap: () async {
                                         final Uri url = Uri.parse(event.link);
                                         if (!await launchUrl(url,
@@ -409,9 +571,89 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     _buildDetailRow(
                                       context,
                                       'assets/icons/location.svg',
-                                      'Location:',
-                                      event.location,
+                                      'Venue:',
+                                      value: event.location,
                                     ),
+                                  const Divider(
+                                    height: 32,
+                                    thickness: 1,
+                                    color: Colors.grey,
+                                  ),
+                                  _buildTagsRow(context, event.tags),
+                                  // _buildDetailRow(
+                                  //   context,
+                                  //   'assets/icons/tags.svg',
+                                  //   'Tags:',
+                                  //   customWidget: Wrap(
+                                  //     spacing: 8.0,
+                                  //     children: event.tags
+                                  //         .map((tag) => Chip(
+                                  //               label: Text(tag),
+                                  //               backgroundColor: whiteColor,
+                                  //             ))
+                                  //         .toList(),
+                                  //   ),
+                                  // ),
+                                  const Divider(
+                                    height: 32,
+                                    thickness: 1,
+                                    color: Colors.grey,
+                                  ),
+                                  // Ratings Section
+                                  const SizedBox(height: 8),
+                                  _buildDetailRow(
+                                    context,
+                                    'assets/icons/rating.svg',
+                                    'Rating:',
+                                    customWidget: Row(
+                                      children: [
+                                        RatingBar.builder(
+                                          initialRating: _userRating,
+                                          minRating: 1,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          itemSize: 30,
+                                          itemBuilder: (context, _) =>
+                                              const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (rating) async {
+                                            final user = FirebaseAuth
+                                                .instance.currentUser;
+                                            if (user != null) {
+                                              setState(() {
+                                                _userRating = rating;
+                                              });
+                                              await _firestoreService
+                                                  .addUserRating(user.uid,
+                                                      event.id, rating);
+                                              showCustomSnackBar(context,
+                                                  'Thanks for rating!'); // Show snackbar
+                                            } else {
+                                              showCustomSnackBar(context,
+                                                  'Please log in to rate this event',
+                                                  isError: true);
+                                            }
+                                          },
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text('(${event.ratingsCount} ratings)'),
+                                      ],
+                                    ),
+                                  ),
+                                  // Comments Section
+                                  const SizedBox(height: 15),
+                                  Text(
+                                    'Comments',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildCommentsList(),
+                                  _buildCommentInput(),
                                 ],
                               ),
                             ),

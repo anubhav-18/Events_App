@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:32500537433:android:038ae2d4039f3f24b23948",
         "android_client_info": {
-          "package_name": "com.example.cu_events"
+          "package_name": "com.hactech.cu_events"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "32500537433-pkdck2fnb2mmo1ni1c9m9o07h7a03cjg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.cu_events",
+            "package_name": "com.hactech.cu_events",
             "certificate_hash": "fed4533a5854bc1b47834cacc69d7fa409eb5686"
           }
         },

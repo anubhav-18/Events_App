@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({Key? key, }) : super(key: key);
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -19,15 +19,29 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final FirestoreService _firestoreService = FirestoreService();
-  final TextEditingController _searchController = TextEditingController();
+  TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final SpeechToText _speechToText = SpeechToText();
   bool _isListening = false;
+  bool _isLoading = false;
+
+  late SearchProvider searchProvider;
+  String? initialQuery;
 
   @override
   void initState() {
     super.initState();
+    searchProvider = Provider.of<SearchProvider>(context, listen: false);
     _searchFocusNode.requestFocus();
+    // Check for initial query from the previous page
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initialQuery = ModalRoute.of(context)?.settings.arguments as String?;
+      if (initialQuery != null) {
+        _searchController.text = initialQuery!;
+        searchProvider.searchEvents(initialQuery!, isTagSearch: true); 
+        setState(() {}); // Trigger a rebuild to show the initial query
+      }
+    });
   }
 
   @override
@@ -35,33 +49,6 @@ class _SearchPageState extends State<SearchPage> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     super.dispose();
-  }
-
-  void startListening() async {
-    if (!_isListening) {
-      bool available = await _speechToText.initialize(
-        onStatus: (status) {
-          if (status == SpeechToText.listeningStatus) {
-            setState(() => _isListening = true);
-          }
-        },
-      );
-      if (available) {
-        _speechToText.listen(
-          onResult: (result) {
-            setState(() {
-              _searchController.text = result.recognizedWords;
-            });
-          },
-        );
-      }
-    } else {
-      setState(() => _isListening = false);
-      _speechToText.stop();
-      // Perform search when speech recognition stops
-      Provider.of<SearchProvider>(context, listen: false)
-          .searchEvents(_searchController.text);
-    }
   }
 
   Widget _buildSuffixIcon(SearchProvider searchProvider) {
@@ -86,21 +73,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
     } else {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: Colors.grey[400]!, // Divider color
-              width: 1.0, // Divider thickness
-            ),
-          ),
-        ),
-        child: IconButton(
-          icon: Icon(_isListening ? Icons.stop : Icons.mic),
-          onPressed: () => startListening(),
-        ),
-      );
+      return const SizedBox.shrink();
     }
   }
 
@@ -170,7 +143,6 @@ class _SearchPageState extends State<SearchPage> {
                   if (_searchController.text.isEmpty) ...[
                     _buildRecentSearches(searchProvider),
                     _buildTrendingSearches(searchProvider),
-                    _buildPopularEvents(searchProvider),
                   ] else ...[
                     const Text('Search Results',
                         style: TextStyle(
@@ -277,36 +249,6 @@ class _SearchPageState extends State<SearchPage> {
           }).toList(),
         ),
         const SizedBox(height: 10),
-      ],
-    );
-  }
-
-  Widget _buildPopularEvents(SearchProvider searchProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Popular Events',
-          style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                color: primaryBckgnd,
-              ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 200,
-          child: ListView.separated(
-            separatorBuilder: (context, index) {
-              return const SizedBox(
-                width: 10,
-              );
-            },
-            scrollDirection: Axis.horizontal,
-            itemCount: searchProvider.popularEvents.length,
-            itemBuilder: (context, index) =>
-                _buildEventCard(searchProvider.popularEvents[index], true),
-          ),
-        ),
-        const SizedBox(height: 16),
       ],
     );
   }

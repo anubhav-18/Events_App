@@ -1,14 +1,16 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cu_events/src/UI/home/home_sections/ongoing_section.dart';
+import 'package:cu_events/src/UI/home/home_sections/feautred_event_section.dart';
 import 'package:cu_events/src/UI/home/home_sections/profile_picture.dart';
+import 'package:cu_events/src/UI/home/home_sections/recommeded_events.dart';
 import 'package:cu_events/src/models/user_model.dart';
 import 'package:cu_events/src/services/auth_service.dart';
 import 'package:cu_events/src/services/firestore_service.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/event_model.dart';
-import 'package:cu_events/src/UI/home/home_sections/categories_section.dart';
-import 'package:cu_events/src/UI/home/home_sections/popular_event_section.dart';
 import 'package:cu_events/src/UI/home/home_sections/search_view.dart';
 import 'package:cu_events/src/UI/home/home_sections/upcoming_event_section.dart';
 import 'package:flutter/material.dart';
@@ -32,19 +34,30 @@ class _HomepageState extends State<Homepage> {
   List<EventModel> _popularEvents = [];
   List<EventModel> _upcomingEvents = [];
   List<EventModel> _ongoingEvents = [];
+  List<EventModel> _filteredEvents = [];
+  List<EventModel> _featuredEvents = [];
   bool _isLoading = true;
   String? _selectedCategory;
   UserModel? _userModel;
   late TextEditingController _firstNameController;
-  File? _image;
-  String? _imageUrl;
   final AuthService _auth = AuthService();
+  String userId = '';
 
   @override
   void initState() {
     super.initState();
     _fetchEvents();
     _userModel = widget.updatedUser;
+    _getUserId();
+  }
+
+  Future<void> _getUserId() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid; // Set the user ID
+      });
+    }
   }
 
   Future<void> _fetchEvents() async {
@@ -57,8 +70,48 @@ class _HomepageState extends State<Homepage> {
               event.enddate!.isAfter(DateTime.now()))
           .toList();
 
-      _popularEvents = await _firestoreService.getPopularEvents();
       _upcomingEvents = await _firestoreService.getUpcomingEvents();
+
+      // Filter recommended events based on user interests
+
+      final user = _auth.currentUser;
+      if (user != null) {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (userDoc.exists) {
+          final userInterests = (userDoc.data()?['interests'] as List<dynamic>?)
+                  ?.cast<String>() ??
+              [];
+
+          // Filter ongoing AND upcoming events based on user interests
+          _filteredEvents = allEvents
+              .where((event) =>
+                  event.tags.any((tag) => userInterests.contains(tag)))
+              .where((event) => event.startdate!
+                  .isAfter(DateTime.now().subtract(const Duration(days: 30))))
+              .toList();
+
+          _filteredEvents.sort((a, b) {
+            final aScore = _calculateEventScore(a);
+            final bScore = _calculateEventScore(b);
+            return bScore.compareTo(aScore); // Descending order
+          });
+        }
+
+        try {
+          final user = _auth.currentUser;
+          final userInterests = user != null
+              ? await _firestoreService.getUserInterests(user.uid)
+              : null;
+
+          _featuredEvents =
+              await _firestoreService.getFeaturedEvents(userInterests);
+        } catch (e) {
+          print('Error fetching featured events: $e');
+        }
+      }
     } catch (e) {
       print('Error fetching events: $e');
     } finally {
@@ -68,6 +121,31 @@ class _HomepageState extends State<Homepage> {
         });
       }
     }
+  }
+
+  double _calculateEventScore(EventModel event) {
+    const clickWeight = 0.5;
+    const ratingWeight = 0.3;
+    const recencyWeight = 0.2;
+
+    final daysSinceStart =
+        DateTime.now().difference(event.startdate!).inDays.toDouble();
+
+    // 1. Normalize Clicks:
+    final maxClicks = _filteredEvents.isNotEmpty
+        ? _filteredEvents.map((e) => e.clicks).reduce(max)
+        : 1; // Max clicks among filtered events or 1 to avoid division by 0
+    final normalizedClicks = event.clicks / maxClicks;
+
+    // 2. Normalize Ratings:
+    const maxRating = 5.0; // Maximum possible rating
+    final normalizedRating = event.rating / maxRating;
+
+    final clickScore = normalizedClicks * clickWeight;
+    final ratingScore = normalizedRating * ratingWeight;
+    final recencyScore = (30 - daysSinceStart) * recencyWeight;
+
+    return clickScore + ratingScore + recencyScore;
   }
 
   Future<void> _fetchUserDetails() async {
@@ -82,7 +160,6 @@ class _HomepageState extends State<Homepage> {
             _userModel = userModel;
             _firstNameController =
                 TextEditingController(text: userModel.firstName);
-            _imageUrl = userModel.profilePicture;
             _isLoading = false;
           });
         }
@@ -173,23 +250,37 @@ class _HomepageState extends State<Homepage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Popular Section
-                PopularEventsCarousel(
-                  popularEvents: _popularEvents,
+                // Fetured Events
+                FeaturedEventsCarousel(
+                  featuredEvents: _featuredEvents,
                   isLoading: _isLoading,
                 ),
-                // Categories Section
-                EventCategorySelector(
-                  selectedCategory: _selectedCategory,
+                // Recommeded Section
+                RecommendedEventsList(
                   isLoading: _isLoading,
+                  recommededEvents: _filteredEvents,
+                  onEventClick: (eventId) async {
+                    await _firestoreService.incrementEventClicks(eventId);
+                    setState(() {
+                      // Update the local event's click count if needed
+                      final index =
+                          _filteredEvents.indexWhere((e) => e.id == eventId);
+                      if (index != -1) {
+                        _filteredEvents[index] = _filteredEvents[index]
+                            .copyWith(
+                                clicks: _filteredEvents[index].clicks + 1);
+                      }
+                    });
+                  },
                 ),
-                // Ongoing Events
+                const SizedBox(height: 22),
+                // Ongoing
                 if (_ongoingEvents.isNotEmpty) ...[
                   OngoingEventsList(
                     isLoading: _isLoading,
                     ongoingEvents: _ongoingEvents,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
                 ],
                 // Upcoming Events Section
                 UpcomingEventsList(

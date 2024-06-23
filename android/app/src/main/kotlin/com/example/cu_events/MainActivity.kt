@@ -1,4 +1,4 @@
-package com.example.cu_events
+package com.hactech.cu_events
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

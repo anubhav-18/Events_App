@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:cu_events/src/constants.dart';
-import 'package:cu_events/src/controller/user_logged_inout.dart';
+import 'package:cu_events/src/controller/auth_gate.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
     _animation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOutQuad);
 
-    Timer(const Duration(seconds: 2,milliseconds: 500), () {
+    Timer(const Duration(seconds: 2, milliseconds: 500), () {
       // Adjust timing as needed
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(

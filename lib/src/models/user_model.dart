@@ -8,7 +8,8 @@ class UserModel {
   String? phoneNo;
   String? gender;
   DateTime? dateOfBirth;
-  String? profilePicture;
+  final List<String> interests;
+  String role;
 
   UserModel({
     required this.id,
@@ -18,7 +19,8 @@ class UserModel {
     this.phoneNo,
     this.gender,
     this.dateOfBirth,
-    this.profilePicture,
+    required this.interests,
+    this.role = 'user',
   });
 
   factory UserModel.fromFirestore(Map<String, dynamic> data, String id) {
@@ -30,7 +32,7 @@ class UserModel {
       phoneNo: data['phoneNo'],
       gender: data['gender'],
       dateOfBirth: (data['dateOfBirth'] as Timestamp?)?.toDate(),
-      profilePicture: data['profilePicture'],
+      interests: List<String>.from(data['interests'] ?? []),
     );
   }
 
@@ -43,7 +45,7 @@ class UserModel {
       'phoneNo': phoneNo,
       'gender': gender,
       'dateOfBirth': dateOfBirth,
-      'profilePicture': profilePicture,
+      'interests' : interests,
     };
   }
 }

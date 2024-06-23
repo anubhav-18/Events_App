@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:cu_events/src/UI/home/homepage.dart';
 import 'package:cu_events/src/UI/login/logout_dialog.dart';
 import 'package:cu_events/src/constants.dart';
 import 'package:cu_events/src/models/user_model.dart';
@@ -200,13 +198,12 @@ class _MenuPageState extends State<MenuPage> {
       ),
       child: Row(
         children: [
-          if (_userModel != null && userModel?.profilePicture != null) ...[
+          if (_userModel != null ) ...[
             CircleAvatar(
               radius: 35,
               backgroundColor: primaryBckgnd,
-              backgroundImage: NetworkImage(_userModel?.profilePicture ?? ''),
-              child: Text(
-                userModel?.firstName[0].toUpperCase() ?? 'U',
+              child: Text("A",
+                // userModel?.firstName[0].toUpperCase() ?? 'U',
                 style: const TextStyle(fontSize: 32, color: Colors.white),
               ),
             ),
@@ -274,17 +271,9 @@ class _MenuPageState extends State<MenuPage> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.arrow_back,
-                                  color: Colors.black),
-                              onPressed: () => Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Homepage(
-                                    updatedUser: _userModel,
-                                  ),
-                                ),
-                              ),
-                            ),
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.black),
+                                onPressed: () => Navigator.pop(context)),
                           ],
                         ),
                         _buildProfileHeader(context),
@@ -358,11 +347,6 @@ class _MenuPageState extends State<MenuPage> {
                             'All Events',
                             () => Navigator.of(context).pushNamed('/allevents'),
                             'assets/icons/categories/all_events.svg',
-                          ),
-                          menuListTile(
-                            'Favourites',
-                            () => Navigator.of(context).pushNamed('/favourite'),
-                            'assets/icons/categories/heart.svg',
                           ),
                         ],
                       ),

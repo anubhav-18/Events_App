@@ -40,7 +40,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20,right: 20,left: 20),
+                    padding:
+                        const EdgeInsets.only(bottom: 20, right: 20, left: 20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -53,8 +54,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pushNamed('/home'),
+                                    onPressed: () => Navigator.of(context)
+                                        .pushNamed('/home'),
                                     child: Text(
                                       'Skip',
                                       style: Theme.of(context)

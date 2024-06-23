@@ -72,6 +72,12 @@ dependencies:
   qr_flutter: ^4.1.0
   flip_card: ^0.7.0
   pinput: ^5.0.0
+  connectivity_plus: ^6.0.3
+  get: ^4.6.6
+  flutter_rating_bar: ^4.0.1
+  encrypt: ^5.0.3
+  firebase_remote_config: ^4.4.7
+  horizontal_stepper_flutter: ^1.0.3
 
 dev_dependencies:
   flutter_test:

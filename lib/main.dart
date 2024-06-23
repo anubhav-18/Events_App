@@ -1,7 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cu_events/src/UI/Menu_Items/about_us.dart';
 import 'package:cu_events/src/UI/Menu_Items/faq.dart';
-import 'package:cu_events/src/UI/Menu_Items/favourite.dart';
+import 'package:cu_events/src/UI/btm_nav_section/favourite.dart';
 import 'package:cu_events/src/UI/Menu_Items/feedback.dart';
 import 'package:cu_events/src/UI/Menu_Items/invite_friends.dart';
 import 'package:cu_events/src/UI/Menu_Items/privacy_policy.dart';
@@ -9,8 +9,14 @@ import 'package:cu_events/src/UI/Menu_Items/settings/reset_password.dart';
 import 'package:cu_events/src/UI/Menu_Items/settings/settings.dart';
 import 'package:cu_events/src/UI/Menu_Items/terms_of_service.dart';
 import 'package:cu_events/src/UI/Menu_Items/your_profile.dart';
+import 'package:cu_events/src/UI/client_side/client_dashboard.dart';
+import 'package:cu_events/src/UI/client_side/client_info.dart';
+import 'package:cu_events/src/UI/client_side/client_resetpass.dart';
+import 'package:cu_events/src/UI/home/home_sections/btm_nav_bar.dart';
+import 'package:cu_events/src/UI/home/home_sections/search_view.dart';
 import 'package:cu_events/src/UI/splashscreen/splashscreen.dart';
 import 'package:cu_events/src/constants.dart';
+import 'package:cu_events/src/controller/network_contoller.dart';
 import 'package:cu_events/src/provider/favourite_provider.dart';
 import 'package:cu_events/src/provider/search_provider.dart';
 import 'package:cu_events/src/services/auth_service.dart';
@@ -25,10 +31,11 @@ import 'package:cu_events/src/UI/login/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -65,6 +72,7 @@ void main() async {
       ),
     );
   });
+  DependencyInjection.init();
 }
 
 Future<void> _openImage(String imagePath) async {
@@ -82,17 +90,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // final ConnectivityService _connectivityService = ConnectivityService();
-
-  // @override
-  // void dispose() {
-  //   _connectivityService.dispose();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Roboto',
@@ -162,7 +162,7 @@ class _MyAppState extends State<MyApp> {
         '/allevents': (context) => const AllEventsPage(),
         '/feedback': (context) => const FeedbackPage(),
         '/aboutus': (context) => const AboutUsPage(),
-        // '/category': (context) => const CategoriesPage(),
+        '/search': (context) => const SearchPage(),
         '/login': (context) => const LoginScreen(),
         '/create': (context) => const CreateAccountPage(),
         '/forgetpassword': (context) => const ForgotPasswordPage(),
@@ -174,6 +174,10 @@ class _MyAppState extends State<MyApp> {
         '/invite': (context) => const InviteFriendsPage(),
         '/settings': (context) => const SettingsPage(),
         '/resetpassword': (context) => const ResetPasswordPage(),
+        '/btmnav': (context) => const BtmNavBar(),
+        '/clientInfo': (context) => const ClientInfo(),
+        '/clientDashboard': (context) => const ClientDashboard(),
+        '/clientresetpass': (context) => const ClientResetpass(),
       },
     );
   }

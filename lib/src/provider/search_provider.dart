@@ -6,13 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SearchProvider with ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   List<EventModel> _searchResults = [];
-  List<EventModel> _popularEvents = [];
   List<String> _recentSearches = [];
   List<String> _trendingSearches = [];
   bool _isLoading = false;
 
   List<EventModel> get searchResults => _searchResults;
-  List<EventModel> get popularEvents => _popularEvents;
   List<String> get recentSearches => _recentSearches;
   List<String> get trendingSearches => _trendingSearches;
   bool get isLoading => _isLoading;
@@ -20,7 +18,6 @@ class SearchProvider with ChangeNotifier {
   SearchProvider() {
     _loadRecentSearches();
     _fetchTrendingSearches();
-    _loadPopularEvents();
   }
 
   Future<void> _loadRecentSearches() async {
@@ -43,16 +40,12 @@ class SearchProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _loadPopularEvents() async {
-    try {
-      _popularEvents = await _firestoreService.getPopularEvents();
-      notifyListeners();
-    } catch (e) {
-      print('Error fetching popular events searches: $e');
-    }
+  void updateSearchResults(List<EventModel> newResults) {
+    _searchResults = newResults;
+    notifyListeners();
   }
 
-  Future<void> searchEvents(String query) async {
+  Future<void> searchEvents(String query, {bool isTagSearch = false}) async {
     print('Searching for: $query');
     if (query.isEmpty) {
       _searchResults.clear();
@@ -65,16 +58,24 @@ class SearchProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      List<EventModel> titleResults =
-          await _firestoreService.searchEvents(query.toLowerCase());
-      print("Title results: $titleResults");
-      List<EventModel> categoryResults = await _firestoreService
-          .searchEventsByCategoryOrSubcategory(query.toLowerCase());
-      print("Category results: $categoryResults");
-      Set<EventModel> uniqueResults = {...titleResults, ...categoryResults};
+      List<EventModel> results = [];
+      if (isTagSearch) {
+        // results =
+            // await _firestoreService.searchEventsByTags([query.toLowerCase()]);
+      } else {
+        final titleResults =
+            await _firestoreService.searchEvents(query.toLowerCase());
+        // final tagResults =
+            // await _firestoreService.searchEventsByTags([query.toLowerCase()]);
 
-      print('Unique search results: $uniqueResults');
-      _searchResults = uniqueResults.toList();
+        // Combine and deduplicate results (you can optimize this as needed)
+        final uniqueResults = Set<EventModel>();
+        uniqueResults.addAll(titleResults);
+        // uniqueResults.addAll(tagResults);
+        results = uniqueResults.toList();
+      }
+
+      _searchResults = results;
       _isLoading = false;
       notifyListeners();
       _updateRecentSearches(query);
@@ -119,6 +120,4 @@ class SearchProvider with ChangeNotifier {
       print("Failed to remove recent search: $e");
     }
   }
-
-  
 }

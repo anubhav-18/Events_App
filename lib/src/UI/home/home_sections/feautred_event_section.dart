@@ -7,21 +7,21 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class PopularEventsCarousel extends StatefulWidget {
-  final List<EventModel> popularEvents;
+class FeaturedEventsCarousel extends StatefulWidget {
+  final List<EventModel> featuredEvents;
   final bool isLoading;
 
-  const PopularEventsCarousel({
+  const FeaturedEventsCarousel({
     Key? key,
-    required this.popularEvents,
+    required this.featuredEvents,
     required this.isLoading,
   }) : super(key: key);
 
   @override
-  State<PopularEventsCarousel> createState() => _PopularEventsCarouselState();
+  State<FeaturedEventsCarousel> createState() => _FeaturedEventsCarouselState();
 }
 
-class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
+class _FeaturedEventsCarouselState extends State<FeaturedEventsCarousel> {
   int _currentIndex = 0;
   final CarouselController _carouselController = CarouselController();
   @override
@@ -30,16 +30,16 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Popular Events',
+          'Featured Events',
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: 10),
         widget.isLoading
             ? _buildShimmerPlaceholder()
-            : widget.popularEvents.isNotEmpty
+            : widget.featuredEvents.isNotEmpty
                 ? CarouselSlider(
-                    items: widget.popularEvents.map((event) {
-                      return _buildPopularEventCard(context, event);
+                    items: widget.featuredEvents.map((event) {
+                      return _buildFeaturedEventCard(context, event);
                     }).toList(),
                     carouselController: _carouselController,
                     options: CarouselOptions(
@@ -49,8 +49,8 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
                       autoPlayAnimationDuration:
                           const Duration(milliseconds: 800),
                       autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: true,
-                      viewportFraction: 0.8,
+                      enlargeCenterPage: false,
+                      viewportFraction: 1,
                       onPageChanged: (index, reason) {
                         setState(() {
                           _currentIndex = index;
@@ -60,7 +60,7 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
                   )
                 : const Center(
                     child: Text(
-                      'There are no popular events',
+                      'There are no Featured events',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -71,7 +71,7 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
         Center(
           child: AnimatedSmoothIndicator(
             activeIndex: _currentIndex,
-            count: widget.popularEvents.length,
+            count: widget.featuredEvents.length,
             effect: const ScrollingDotsEffect(
               activeDotColor: primaryBckgnd,
               dotColor: Colors.grey,
@@ -103,52 +103,57 @@ class _PopularEventsCarouselState extends State<PopularEventsCarousel> {
     );
   }
 
-  Widget _buildPopularEventCard(BuildContext context, EventModel event) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/event_details', arguments: event);
-      },
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  Widget _buildFeaturedEventCard(BuildContext context, EventModel event) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0,right: 8),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, '/event_details', arguments: event);
+        },
         child: Stack(
           children: [
-            CachedImage(
-              imageUrl: event.imageUrl,
-              width: double.infinity,
-              height: double.infinity,
-              boxFit: BoxFit.cover,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: CachedImage(
+                imageUrl: event.imageUrl,
+                width: double.infinity,
+                height: double.infinity,
+                boxFit: BoxFit.cover,
+              ),
             ),
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [Colors.black54, Colors.transparent],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black54, Colors.transparent],
+                    ),
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      event.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: whiteColor),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${DateFormat('MMM d').format(event.startdate!)} - ${DateFormat('MMM d').format(event.enddate!)}',
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: whiteColor, fontWeight: FontWeight.w500),
-                    ),
-                  ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        event.title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(color: whiteColor),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${DateFormat('MMM d').format(event.startdate!)} - ${DateFormat('MMM d').format(event.enddate!)}',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: whiteColor, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
