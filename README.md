@@ -1,4 +1,4 @@
-# Weather App
+# Event App
 
 Events_app is a comprehensive platform that connects users with a wide range of regional and international events. Whether you're looking to attend, participate, or network, Events_app has you covered.
 
