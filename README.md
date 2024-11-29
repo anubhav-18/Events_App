@@ -2,8 +2,6 @@
 
 Events_app is a comprehensive platform that connects users with a wide range of regional and international events. Whether you're looking to attend, participate, or network, Events_app has you covered.
 
-You can download the APK from Events_App/build/app/outputs/flutter-apk from this directory.
-
 ## Key Features for Users:
 
 - **Discover Events**: Browse upcoming events by location, category, or tags.
